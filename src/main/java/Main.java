@@ -18,7 +18,7 @@ public class Main {
 
         Font customFont;
         try {
-            File fontFile = new File("src/PressStart2P-Regular.ttf");
+            File fontFile = new File("src/fonts/PressStart2P-Regular.ttf");
             customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile).deriveFont(58f);
         } catch (Exception e) {
             customFont = new Font("Serif", Font.PLAIN, 58);
