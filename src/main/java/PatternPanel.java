@@ -181,17 +181,18 @@ public class PatternPanel extends JPanel {
                             isHighlighted = true;
                         }
                     }
-
-                    // тінь
+                    Color crossColor;
                     if (isHighlighted) {
-                        g2.setColor(new Color(HIGHLIGHT_COLOR.getRed(), HIGHLIGHT_COLOR.getGreen(), HIGHLIGHT_COLOR.getBlue(), 70));
+                        crossColor = HIGHLIGHT_COLOR;
                     } else {
-                        g2.setColor(grid[row][col] == 1 ? new Color(218, 151, 151, 100) : new Color(58, 56, 56, 100));
+                        crossColor = (grid[row][col] == 1) ? RED : BLACK;
                     }
+                    Color shadowColor = new Color(crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), 80);
+
+                    g2.setColor(shadowColor);
                     g2.fillRect(x + 3, y + 3, cellSize - 5, cellSize - 5);
 
-                    // хрестик
-                    g2.setColor(isHighlighted ? HIGHLIGHT_COLOR : (grid[row][col] == 1 ? RED : BLACK));
+                    g2.setColor(crossColor);
                     g2.setStroke(new BasicStroke(7, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     int p = 8;
                     g2.drawLine(x + p, y + p, x + cellSize - p, y + cellSize - p);
