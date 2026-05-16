@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,7 +26,12 @@ public class Main {
         }
 
         PatternPanel panel = new PatternPanel();
+        Capabilities menuPanel = new Capabilities(customFont, panel);
+        menuPanel.setBorder(new EmptyBorder(50, 20, 20, 20));
 
+        frame.setLayout(new BorderLayout());
+
+        frame.add(menuPanel, BorderLayout.WEST);
         String name = "Дар'я";
 
         for (int i = 0; i < name.length(); i++) {
@@ -53,8 +59,9 @@ public class Main {
             topPanel.add(letterLabel);
         }
 
-        frame.setLayout(new BorderLayout());
-        frame.add(topPanel, BorderLayout.NORTH);
+        frame.add(topPanel, BorderLayout.NORTH );
+        topPanel.setBorder(new EmptyBorder(0, 230, 0, 0));
+
         frame.add(panel, BorderLayout.CENTER);
 
         frame.setVisible(true);
