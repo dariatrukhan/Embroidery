@@ -12,6 +12,9 @@ public class DrawPanel extends JPanel {
     private Color selectedColor = new Color(193, 91, 91);
     private boolean isEraserActive = false;
 
+    private boolean isHorizSymActive = false;
+    private boolean isVertSymActive = false;
+
     private final Color CANVAS_COLOR = new Color(245, 235, 215);
     private final Color HOLE_COLOR = new Color(180, 170, 150);
     private final Color TEXT_COLOR = new Color(74, 59, 59);
@@ -54,7 +57,6 @@ public class DrawPanel extends JPanel {
         JButton chooseColorBtn = createToolButton("ОБРАТИ КОЛІР", TEXT_COLOR, baseFont);
         chooseColorBtn.setBackground(new Color(245, 235, 215));
         chooseColorBtn.setForeground(TEXT_COLOR);
-
         chooseColorBtn.addActionListener(e -> {
             Color chosen = JColorChooser.showDialog(this, "Оберіть колір", selectedColor);
             if (chosen != null) {
@@ -81,12 +83,58 @@ public class DrawPanel extends JPanel {
                 colorIndicator.setBorder(new LineBorder(Color.WHITE, 3));
             }
         });
-        chooseColorBtn.addActionListener(e -> eraserBtn.setBorder(new LineBorder(TEXT_COLOR, 2)));
+        chooseColorBtn.addActionListener(e -> eraserBtn.setBorder(new LineBorder(TEXT_COLOR, 3)));
+
+        // очистити
+        JButton clearBtn = createToolButton("ОЧИСТИТИ", TEXT_COLOR, baseFont);
+        clearBtn.setBackground(new Color(255, 210, 210));
+        clearBtn.setForeground(TEXT_COLOR);
+        clearBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Повністю очистити полотно?",
+                    "Очищення", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                clearGrid();
+                repaint();
+            }
+        });
 
         palettePanel.add(chooseColorBtn);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        palettePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         palettePanel.add(eraserBtn);
+        palettePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        palettePanel.add(clearBtn);
+        palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
+        // симетрія
+        JLabel symmetryTitle = new JLabel("СИМЕТРІЯ");
+        symmetryTitle.setFont(baseFont.deriveFont(11f));
+        symmetryTitle.setForeground(TEXT_COLOR);
+        symmetryTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        palettePanel.add(symmetryTitle);
+        palettePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        // горизонтальна симетрія
+        JCheckBox horizCheck = new JCheckBox("горизонтальна");
+        horizCheck.setFont(baseFont.deriveFont(12f));
+        horizCheck.setForeground(TEXT_COLOR);
+        horizCheck.setOpaque(false);
+        horizCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
+        horizCheck.addActionListener(e -> isHorizSymActive = horizCheck.isSelected());
+
+        // вертикальна симетрія
+        JCheckBox vertCheck = new JCheckBox("вертикальна");
+        vertCheck.setFont(baseFont.deriveFont(12f));
+        vertCheck.setForeground(TEXT_COLOR);
+        vertCheck.setOpaque(false);
+        vertCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
+        vertCheck.addActionListener(e -> isVertSymActive = vertCheck.isSelected());
+
+        palettePanel.add(horizCheck);
+        palettePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        palettePanel.add(vertCheck);
+
+        //палітра
         JPanel paletteWrapper = new JPanel(new GridBagLayout());
         paletteWrapper.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -97,36 +145,26 @@ public class DrawPanel extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                int gridTotalSize = GRID_COUNT * cellSize;
-                int offsetX = (getWidth() - gridTotalSize) / 2;
-                int offsetY = (getHeight() - gridTotalSize) / 2;
-
-                int col = (e.getX() - offsetX) / cellSize;
-                int row = (e.getY() - offsetY) / cellSize;
-
-                if (col >= 0 && col < GRID_COUNT && row >= 0 && row < GRID_COUNT) {
-                    if (isEraserActive) {
-                        grid[row][col] = 0;
-                    } else {
-                        grid[row][col] = selectedColor.getRGB();
-                    }
-                    repaint();
-                }
-            }
-        });
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                drawAtPoint(e.getX(), e.getY()); // при одному кліку
+                drawAtPoint(e.getX(), e.getY());
             }
         });
 
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                drawAtPoint(e.getX(), e.getY()); // поки затиснута мишка
+                drawAtPoint(e.getX(), e.getY());
             }
         });
+
+        clearGrid(); // чисте поле
+    }
+
+    private void clearGrid() {
+        for (int row = 0; row < GRID_COUNT; row++) {
+            for (int col = 0; col < GRID_COUNT; col++) {
+                grid[row][col] = 0;
+            }
+        }
     }
 
     private void drawAtPoint(int mouseX, int mouseY) {
@@ -138,11 +176,30 @@ public class DrawPanel extends JPanel {
         int row = (mouseY - offsetY) / cellSize;
 
         if (col >= 0 && col < GRID_COUNT && row >= 0 && row < GRID_COUNT) {
-            if (isEraserActive) {
-                grid[row][col] = 0;
-            } else {
-                grid[row][col] = selectedColor.getRGB();
+            int valueToSet = isEraserActive ? 0 : selectedColor.getRGB();
+
+            // основна точка
+            grid[row][col] = valueToSet;
+
+            // дзеркало по горизонталі (ліво право)
+            if (isHorizSymActive) {
+                int mirrorCol = GRID_COUNT - 1 - col;
+                grid[row][mirrorCol] = valueToSet;
             }
+
+            // дзеркало по вертикалі (верх низ)
+            if (isVertSymActive) {
+                int mirrorRow = GRID_COUNT - 1 - row;
+                grid[mirrorRow][col] = valueToSet;
+            }
+
+            // разом
+            if (isHorizSymActive && isVertSymActive) {
+                int mirrorCol = GRID_COUNT - 1 - col;
+                int mirrorRow = GRID_COUNT - 1 - row;
+                grid[mirrorRow][mirrorCol] = valueToSet;
+            }
+
             repaint();
         }
     }
@@ -169,7 +226,7 @@ public class DrawPanel extends JPanel {
         JButton btn = new JButton(text);
         btn.setFont(font.deriveFont(10f));
         btn.setOpaque(true);
-        btn.setContentAreaFilled(false);
+        btn.setContentAreaFilled(true);
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBorder(new LineBorder(borderCol, 2));
@@ -216,7 +273,7 @@ public class DrawPanel extends JPanel {
             for (int row = 0; row < GRID_COUNT; row++) {
                 System.arraycopy(loadedData[row], 0, this.grid[row], 0, GRID_COUNT);
             }
-            repaint(); // Оновлюємо полотно, щоб хрестики з'явилися
+            repaint();
         }
     }
 
