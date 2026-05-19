@@ -1,15 +1,14 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
+import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class Capabilities extends JPanel {
     private static final Color BUTTON_BG = new Color(202, 238, 248);
     private static final Color BUTTON_TEXT = new Color(74, 59, 59);
     private final Color HOVER_BG = new Color(60, 189, 209);
 
-    public Capabilities(JPanel mainContainer, CardLayout cardLayout, PatternPanel patternPanel, Font baseFont) {
+    public Capabilities(JPanel mainContainer, CardLayout cardLayout, PatternPanel patternPanel, Font baseFont, DrawPanel drawPanel) {
 
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -31,6 +30,17 @@ public class Capabilities extends JPanel {
 
                     }else if (menuItem.equals("Новий")) {
                         cardLayout.show(mainContainer, "DRAW");
+                    }
+                    else if (menuItem.equals("Вставити")) {
+                        // 1. Викликаємо завантажувач (передаємо параметри DrawPanel: 17 і 30)
+                        int[][] loadedData = ImageSaver.loadPanelFromPNG(Capabilities.this, 17, 30);
+
+                        if (loadedData != null) {
+                            // 2. Закидаємо зчитані хрестики в DrawPanel
+                            drawPanel.loadGridData(loadedData);
+                            // 3. Перемикаємо екран на сторінку малювання
+                            cardLayout.show(mainContainer, "DRAW");
+                        }
                     }
                 }
 

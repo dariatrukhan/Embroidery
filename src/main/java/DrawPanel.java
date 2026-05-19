@@ -1,8 +1,7 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
+import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class DrawPanel extends JPanel {
     private final int GRID_COUNT = 17;
@@ -21,7 +20,7 @@ public class DrawPanel extends JPanel {
     private final Color PALETTE_BORDER = new Color(140, 130, 110);
 
     public DrawPanel(JPanel mainContainer, CardLayout cardLayout, Font baseFont) {
-        setBackground(CANVAS_COLOR);
+
         setLayout(new BorderLayout());
 
         JPanel topPanel = getJPanel(mainContainer, cardLayout, baseFont);
@@ -212,5 +211,13 @@ public class DrawPanel extends JPanel {
         PatternPanel.hole(g2, offsetX, offsetY, cellSize, gridTotalSize);
     }
 
+    public void loadGridData(int[][] loadedData) {
+        if (loadedData != null) {
+            for (int row = 0; row < GRID_COUNT; row++) {
+                System.arraycopy(loadedData[row], 0, this.grid[row], 0, GRID_COUNT);
+            }
+            repaint(); // Оновлюємо полотно, щоб хрестики з'явилися
+        }
+    }
 
 }

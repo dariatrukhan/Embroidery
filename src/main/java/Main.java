@@ -1,9 +1,8 @@
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
+import java.awt.event.*;
+import java.io.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,8 +27,9 @@ public class Main {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 15));
         topPanel.setBorder(new EmptyBorder(15, 240, 0, 0));
 
+        DrawPanel drawPanel = new DrawPanel(mainContainer, cardLayout, customFont);
         PatternPanel panel = new PatternPanel();
-        Capabilities menuPanel = new Capabilities(mainContainer, cardLayout, panel, customFont);
+        Capabilities menuPanel = new Capabilities(mainContainer, cardLayout, panel, customFont, drawPanel );
         menuPanel.setBorder(new EmptyBorder(50, 20, 20, 20));
 
         frame.setLayout(new BorderLayout());
@@ -65,10 +65,8 @@ public class Main {
         mainPage.add(topPanel, BorderLayout.NORTH);
         mainPage.add(panel, BorderLayout.CENTER);
 
-        DrawPanel drawPage = new DrawPanel(mainContainer, cardLayout, customFont);
-
         mainContainer.add(mainPage, "MAIN");
-        mainContainer.add(drawPage, "DRAW");
+        mainContainer.add(drawPanel, "DRAW");
 
         frame.add(mainContainer);
 
