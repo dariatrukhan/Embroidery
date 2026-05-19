@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PatternPanel extends JPanel {
-    private final int GRID_COUNT = 17;
+    private static final int GRID_COUNT = 17;
     private final int[][] grid = new int[GRID_COUNT][GRID_COUNT];
 
     // [індекс літери][рядок][стовпчик]
@@ -11,7 +11,7 @@ public class PatternPanel extends JPanel {
     private int activeSector = -1;
 
     private final Color CANVAS_COLOR = new Color(245, 235, 215);
-    private final Color HOLE_COLOR = new Color(180, 170, 150);
+    private static final Color HOLE_COLOR = new Color(180, 170, 150);
     private final Color RED = new Color(193, 91, 91);
     private final Color BLACK = new Color(74, 59, 59);
     private final Color HIGHLIGHT_COLOR = new Color(60, 189, 209);
@@ -187,20 +187,27 @@ public class PatternPanel extends JPanel {
                     } else {
                         crossColor = (grid[row][col] == 1) ? RED : BLACK;
                     }
-                    Color shadowColor = new Color(crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), 80);
+                    cross(g2, x, y, cellSize, crossColor);
 
-                    g2.setColor(shadowColor);
-                    g2.fillRect(x + 3, y + 3, cellSize - 5, cellSize - 5);
-
-                    g2.setColor(crossColor);
-                    g2.setStroke(new BasicStroke(7, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    int p = 8;
-                    g2.drawLine(x + p, y + p, x + cellSize - p, y + cellSize - p);
-                    g2.drawLine(x + cellSize - p, y + p, x + p, y + cellSize - p);
                 }
             }
         }
 
+       hole(g2, offsetX, offsetY, cellSize, gridTotalSize);
+    }
+    static void cross(Graphics2D g2, int x, int y, int cellSize, Color crossColor){
+        Color shadowColor = new Color(crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), 80);
+
+        g2.setColor(shadowColor);
+        g2.fillRect(x + 3, y + 3, cellSize - 5, cellSize - 5);
+
+        g2.setColor(crossColor);
+        g2.setStroke(new BasicStroke(7, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        int p = 8;
+        g2.drawLine(x + p, y + p, x + cellSize - p, y + cellSize - p);
+        g2.drawLine(x + cellSize - p, y + p, x + p, y + cellSize - p);
+    }
+    static void hole( Graphics2D g2, int offsetX, int offsetY, int cellSize, int gridTotalSize){
         // точки
         g2.setColor(HOLE_COLOR);
         for (int i = 0; i <= GRID_COUNT; i++) {

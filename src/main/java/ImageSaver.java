@@ -7,10 +7,23 @@ import java.io.IOException;
 
 public class ImageSaver {
 
-    public static void savePanelAsPNG(JPanel panel) {
-        BufferedImage image = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    public static void savePanelAsPNG(PatternPanel panel) {
+        int cellSize = 30;
+        int gridCount = 17;
+        int gridTotalSize = gridCount * cellSize;
 
+        int canvasWidth = gridTotalSize + 40;
+        int canvasHeight = gridTotalSize + 40;
+
+        BufferedImage image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
+
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        int currentOffsetX = (panel.getWidth() - gridTotalSize) / 2;
+        int currentOffsetY = (panel.getHeight() - gridTotalSize) / 2;
+
+        g2d.translate(-(currentOffsetX - 20), -(currentOffsetY - 20));
         panel.paint(g2d);
         g2d.dispose();
 

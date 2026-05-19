@@ -5,13 +5,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class Capabilities extends JPanel {
-    private final Color BUTTON_BG = new Color(202, 238, 248);
-    private final Color BUTTON_TEXT = new Color(74, 59, 59);
+    private static final Color BUTTON_BG = new Color(202, 238, 248);
+    private static final Color BUTTON_TEXT = new Color(74, 59, 59);
     private final Color HOVER_BG = new Color(60, 189, 209);
-    private final PatternPanel patternPanel;
 
-    public Capabilities(Font baseFont, PatternPanel patternPanel) {
-        this.patternPanel = new PatternPanel();
+    public Capabilities(JPanel mainContainer, CardLayout cardLayout, PatternPanel patternPanel, Font baseFont) {
+
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -30,8 +29,8 @@ public class Capabilities extends JPanel {
 
                         ImageSaver.savePanelAsPNG(patternPanel);
 
-                    } else if (menuItem.equals("Очистити")) {
-                        patternPanel.highlightSector(-1);
+                    }else if (menuItem.equals("Новий")) {
+                        cardLayout.show(mainContainer, "DRAW");
                     }
                 }
 
@@ -53,7 +52,7 @@ public class Capabilities extends JPanel {
         }
     }
 
-    private JButton createPixelButton(String text, Font font) {
+    public static JButton createPixelButton(String text, Font font) {
         JButton button = new JButton(text);
         button.setFont(font);
         button.setForeground(BUTTON_TEXT);
@@ -63,7 +62,7 @@ public class Capabilities extends JPanel {
         button.setOpaque(true);
 
         button.setFocusPainted(false);
-        button.setBorder(new LineBorder(BUTTON_TEXT, 3)); // Жирна рамка
+        button.setBorder(new LineBorder(BUTTON_TEXT, 3));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         button.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -13,10 +13,6 @@ public class Main {
         Dimension screenSize = toolkit.getScreenSize();
         frame.setSize(screenSize.width, screenSize.height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 15));
-
         Font customFont;
         try {
             File fontFile = new File("src/fonts/PressStart2P-Regular.ttf");
@@ -24,9 +20,16 @@ public class Main {
         } catch (Exception e) {
             customFont = new Font("Serif", Font.PLAIN, 58);
         }
+        CardLayout cardLayout = new CardLayout();
+        JPanel mainContainer = new JPanel(cardLayout);
+
+        JPanel mainPage = new JPanel(new BorderLayout());
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 15));
+        topPanel.setBorder(new EmptyBorder(15, 240, 0, 0));
 
         PatternPanel panel = new PatternPanel();
-        Capabilities menuPanel = new Capabilities(customFont, panel);
+        Capabilities menuPanel = new Capabilities(mainContainer, cardLayout, panel, customFont);
         menuPanel.setBorder(new EmptyBorder(50, 20, 20, 20));
 
         frame.setLayout(new BorderLayout());
@@ -58,11 +61,18 @@ public class Main {
 
             topPanel.add(letterLabel);
         }
+        mainPage.add(menuPanel, BorderLayout.WEST);
+        mainPage.add(topPanel, BorderLayout.NORTH);
+        mainPage.add(panel, BorderLayout.CENTER);
 
-        frame.add(topPanel, BorderLayout.NORTH );
-        topPanel.setBorder(new EmptyBorder(0, 230, 0, 0));
+        DrawPanel drawPage = new DrawPanel(mainContainer, cardLayout, customFont);
 
-        frame.add(panel, BorderLayout.CENTER);
+        mainContainer.add(mainPage, "MAIN");
+        mainContainer.add(drawPage, "DRAW");
+
+        frame.add(mainContainer);
+
+        cardLayout.show(mainContainer, "MAIN");
 
         frame.setVisible(true);
     }
