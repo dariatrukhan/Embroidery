@@ -6,7 +6,7 @@ import java.io.*;
 
 public class ImageSaver {
 
-    public static void savePanelAsPNG(PatternPanel panel) {
+    public static void savePanelAsPNG(JPanel panel) {
         int cellSize = 30;
         int gridCount = 17;
         int gridTotalSize = gridCount * cellSize;

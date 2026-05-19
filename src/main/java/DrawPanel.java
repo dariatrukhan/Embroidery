@@ -98,7 +98,6 @@ public class DrawPanel extends JPanel {
                 repaint();
             }
         });
-
         palettePanel.add(chooseColorBtn);
         palettePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         palettePanel.add(eraserBtn);
@@ -106,6 +105,13 @@ public class DrawPanel extends JPanel {
         palettePanel.add(clearBtn);
         palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
+        JButton saveBtn = createToolButton("ЗБЕРЕГТИ", TEXT_COLOR, baseFont);
+        saveBtn.setBackground(new Color(202, 238, 248)); // Блакитний колір, як у головному меню
+        saveBtn.setForeground(TEXT_COLOR);
+
+        saveBtn.addActionListener(e -> ImageSaver.savePanelAsPNG(this));
+        palettePanel.add(saveBtn);
+        palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
         // симетрія
         JLabel symmetryTitle = new JLabel("СИМЕТРІЯ");
         symmetryTitle.setFont(baseFont.deriveFont(11f));
