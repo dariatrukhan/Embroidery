@@ -115,7 +115,7 @@ public class DrawPanel extends JPanel {
         g2.setStroke(new BasicStroke(2));
     }
 
-    private void drawAdaptiveCross(Graphics2D g2, int x, int y, int size, Color crossColor) {
+    public static void drawAdaptiveCross(Graphics2D g2, int x, int y, int size, Color crossColor) {
         Color shadowColor = new Color(crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), 80);
         g2.setColor(shadowColor);
         g2.fillRect(x + 2, y + 2, size - 3, size - 3);
@@ -135,5 +135,8 @@ public class DrawPanel extends JPanel {
             controller.setGrid(loadedData);
             repaint();
         }
+    }
+    public DrawController getController() {
+        return this.controller;
     }
 }

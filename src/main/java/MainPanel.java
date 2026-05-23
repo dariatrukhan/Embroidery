@@ -19,7 +19,7 @@ public class MainPanel extends JFrame {
     private void initWindow() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
-        setSize(screenSize.width, screenSize.height);
+        setSize(900, screenSize.height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
     }

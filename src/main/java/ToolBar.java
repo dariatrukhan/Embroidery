@@ -25,7 +25,7 @@ public class ToolBar extends JPanel {
 
 //———————————————————ЗАГОЛОВОК
         JLabel paletteTitle = new JLabel("ІНСТРУМЕНТИ");
-        paletteTitle.setFont(baseFont.deriveFont(11f));
+        paletteTitle.setFont(baseFont.deriveFont(13f));
         paletteTitle.setForeground(TEXT_COL);
         paletteTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(paletteTitle);
@@ -140,8 +140,7 @@ public class ToolBar extends JPanel {
         saveBtn.setBackground(new Color(202, 238, 248));
         saveBtn.setForeground(TEXT_COL);
         saveBtn.addActionListener(e -> {
-            int currentCellSize = (controller.getGridCount() == 17) ? 30 : (controller.getGridCount() == 27 ? 18 : 13);
-            ImageSaver.savePanelAsPNG(canvasPanel, controller.getGridCount(), currentCellSize);
+            ImageSaver.savePanelAsPNG(this, controller);
         });
         add(saveBtn);
         add(Box.createRigidArea(new Dimension(0, 15)));

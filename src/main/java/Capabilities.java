@@ -24,9 +24,10 @@ public class Capabilities extends JPanel {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
+
                     if (menuItem.equals("Зберегти")) {
-                        ImageSaver.savePanelAsPNG(patternPanel, 17, 30);
-                    } else if (menuItem.equals("Новий")) {
+                        ImageSaver.savePanelAsPNG(patternPanel, drawPanel.getController());
+                    }else if (menuItem.equals("Новий")) {
                         cardLayout.show(mainContainer, "DRAW");
                     } else if (menuItem.equals("Вставити")) {
                         int[][] loadedData = ImageSaver.loadPanelFromPNG(Capabilities.this);

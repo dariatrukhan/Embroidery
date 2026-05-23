@@ -6,7 +6,9 @@ import java.io.*;
 
 public class ImageSaver {
 
-    public static void savePanelAsPNG(JPanel panel, int gridCount, int cellSize) {
+    public static void savePanelAsPNG(Component panel, DrawController controller) {
+        int gridCount = controller.getGridCount();
+        int cellSize = (gridCount == 17) ? 30 : (gridCount == 27 ? 18 : 13);
         int gridTotalSize = gridCount * cellSize;
         int canvasWidth = gridTotalSize + 40;
         int canvasHeight = gridTotalSize + 40;
@@ -15,11 +17,24 @@ public class ImageSaver {
         Graphics2D g2d = image.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int currentOffsetX = (panel.getWidth() - gridTotalSize) / 2;
-        int currentOffsetY = (panel.getHeight() - gridTotalSize) / 2;
+        Color canvasColor = new Color(245, 235, 215);
+        g2d.setColor(canvasColor);
+        g2d.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        g2d.translate(-(currentOffsetX - 20), -(currentOffsetY - 20));
-        panel.paint(g2d);
+        int[][] grid = controller.getGrid();
+        int startOffset = 20;
+
+        for (int row = 0; row < gridCount; row++) {
+            for (int col = 0; col < gridCount; col++) {
+                if (grid[row][col] != 0) {
+                    int x = startOffset + col * cellSize;
+                    int y = startOffset + row * cellSize;
+                    Color crossColor = new Color(grid[row][col]);
+
+                    DrawPanel.drawAdaptiveCross(g2d, x, y, cellSize, crossColor);
+                }
+            }
+        }
         g2d.dispose();
 
         JFileChooser fileChooser = new JFileChooser();
@@ -55,19 +70,18 @@ public class ImageSaver {
                 }
 
                 int width = image.getWidth();
-                int innerWidth = width - 40; // чисте полотно
-                int detectedGridCount = 17;  // значення за замовчуванням
+                int innerWidth = width - 40;
+                int detectedGridCount;
 
                 //  17:17 * 30 = 510, 27:27 * 18 = 486, 37:37 * 13 = 481
-                if (innerWidth >= 485 && innerWidth <= 490) {
-                    detectedGridCount = 27;
-                } else if (innerWidth >= 480 && innerWidth <= 484) {
-                    detectedGridCount = 37;
-                } else {
+                if (innerWidth >= 491 && innerWidth <= 510){
                     detectedGridCount = 17;
                 }
-
-                // розмір клітинки
+                else if (innerWidth >= 485 && innerWidth <= 490) {
+                    detectedGridCount = 27;
+                } else {
+                    detectedGridCount = 37;
+                }
                 double calculatedCellSize = (double) innerWidth / detectedGridCount;
                 int[][] loadedGrid = new int[detectedGridCount][detectedGridCount];
                 int startOffset = 20;
