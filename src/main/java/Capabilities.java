@@ -35,9 +35,31 @@ public class Capabilities extends JPanel {
                             drawPanel.loadGridData(loadedData);
                             cardLayout.show(mainContainer, "DRAW");
                         }
-                    }
-                }
+                    }   else if (menuItem.equals("Редагувати")) {
+                    int[][] patternData = patternPanel.getGrid();
 
+                    if (patternData != null) {
+                        int size = patternData.length;
+                        drawPanel.getController().setGridCount(size);
+                        int[][] rgbGrid = new int[size][size];
+                        for (int r = 0; r < size; r++) {
+                            for (int c = 0; c < size; c++) {
+                                int value = patternData[r][c];
+
+                                if (value == 1) {
+                                    rgbGrid[r][c] = new  Color(193, 91, 91).getRGB();
+                                } else if (value == 3) {
+                                    rgbGrid[r][c] = new Color(74, 59, 59).getRGB(); ;
+                                } else {
+                                    rgbGrid[r][c] = 0;
+                                }
+                            }
+                        }
+                        drawPanel.getController().setGrid(rgbGrid);
+                    }
+                    cardLayout.show(mainContainer, "DRAW");
+                    drawPanel.repaint();
+                }}
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     btn.setBackground(HOVER_BG);

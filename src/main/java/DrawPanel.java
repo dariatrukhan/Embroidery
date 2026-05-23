@@ -14,7 +14,7 @@ public class DrawPanel extends JPanel {
     public DrawPanel(JPanel mainContainer, CardLayout cardLayout, Font baseFont) {
         this.controller = new DrawController();
         setLayout(new BorderLayout());
-
+        setDoubleBuffered(true);
         JPanel topPanel = getJPanel(mainContainer, cardLayout, baseFont);
         add(topPanel, BorderLayout.NORTH);
 

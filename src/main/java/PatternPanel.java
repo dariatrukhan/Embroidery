@@ -214,4 +214,8 @@ public class PatternPanel extends JPanel {
             g2.fillOval(offsetX + i * cellSize - 2, offsetY + gridTotalSize - 2, 4, 4);
         }
     }
+
+    public int[][] getGrid() {
+        return grid;
+    }
 }

@@ -59,4 +59,8 @@ public class DrawController {
     public void setEraserActive(boolean active) { EraserActive = active; }
     public void setHorActive(boolean active) { HorActive = active; }
     public void setVerActive(boolean active) { VerActive = active; }
+
+    public void setGridCount(int patternGridSize) {
+        this.gridCount = patternGridSize;
+    }
 }
