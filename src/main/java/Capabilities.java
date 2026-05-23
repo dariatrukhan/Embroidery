@@ -18,27 +18,20 @@ public class Capabilities extends JPanel {
         String[] menuItems = {"Новий","Редагувати", "Зберегти", "Вставити"};
 
         for (String menuItem : menuItems) {
-            JButton btn = createPixelButton(menuItem, menuFont);
+            JButton btn = statButton(menuItem, menuFont);
 
             btn.addMouseListener(new MouseAdapter() {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (menuItem.equals("Зберегти")) {
-
-                        ImageSaver.savePanelAsPNG(patternPanel);
-
-                    }else if (menuItem.equals("Новий")) {
+                        ImageSaver.savePanelAsPNG(patternPanel, 17, 30);
+                    } else if (menuItem.equals("Новий")) {
                         cardLayout.show(mainContainer, "DRAW");
-                    }
-                    else if (menuItem.equals("Вставити")) {
-                        // 1. Викликаємо завантажувач (передаємо параметри DrawPanel: 17 і 30)
-                        int[][] loadedData = ImageSaver.loadPanelFromPNG(Capabilities.this, 17, 30);
-
+                    } else if (menuItem.equals("Вставити")) {
+                        int[][] loadedData = ImageSaver.loadPanelFromPNG(Capabilities.this);
                         if (loadedData != null) {
-                            // 2. Закидаємо зчитані хрестики в DrawPanel
                             drawPanel.loadGridData(loadedData);
-                            // 3. Перемикаємо екран на сторінку малювання
                             cardLayout.show(mainContainer, "DRAW");
                         }
                     }
@@ -62,7 +55,7 @@ public class Capabilities extends JPanel {
         }
     }
 
-    public static JButton createPixelButton(String text, Font font) {
+    public static JButton statButton(String text, Font font) {
         JButton button = new JButton(text);
         button.setFont(font);
         button.setForeground(BUTTON_TEXT);

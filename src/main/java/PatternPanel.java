@@ -193,7 +193,7 @@ public class PatternPanel extends JPanel {
             }
         }
 
-       hole(g2, offsetX, offsetY, cellSize, gridTotalSize);
+        hole(g2, offsetX, offsetY, cellSize, gridTotalSize, GRID_COUNT);
     }
     static void cross(Graphics2D g2, int x, int y, int cellSize, Color crossColor){
         Color shadowColor = new Color(crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), 80);
@@ -207,10 +207,9 @@ public class PatternPanel extends JPanel {
         g2.drawLine(x + p, y + p, x + cellSize - p, y + cellSize - p);
         g2.drawLine(x + cellSize - p, y + p, x + p, y + cellSize - p);
     }
-    static void hole( Graphics2D g2, int offsetX, int offsetY, int cellSize, int gridTotalSize){
-        // точки
+    public static void hole(Graphics2D g2, int offsetX, int offsetY, int cellSize, int gridTotalSize, int customGridCount) {
         g2.setColor(HOLE_COLOR);
-        for (int i = 0; i <= GRID_COUNT; i++) {
+        for (int i = 0; i <= customGridCount; i++) {
             g2.fillOval(offsetX + gridTotalSize - 2, offsetY + i * cellSize - 2, 4, 4);
             g2.fillOval(offsetX + i * cellSize - 2, offsetY + gridTotalSize - 2, 4, 4);
         }

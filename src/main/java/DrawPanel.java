@@ -1,213 +1,57 @@
 import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class DrawPanel extends JPanel {
-    private final int GRID_COUNT = 17;
-    private final int cellSize = 30;
-
-    private final int[][] grid = new int[GRID_COUNT][GRID_COUNT];
-
-    private Color selectedColor = new Color(193, 91, 91);
-    private boolean isEraserActive = false;
-
-    private boolean isHorizSymActive = false;
-    private boolean isVertSymActive = false;
+    private final DrawController controller;
 
     private final Color CANVAS_COLOR = new Color(245, 235, 215);
     private final Color HOLE_COLOR = new Color(180, 170, 150);
     private final Color TEXT_COLOR = new Color(74, 59, 59);
-
-    private final Color PALETTE_BG = new Color(225, 215, 195);
-    private final Color PALETTE_BORDER = new Color(140, 130, 110);
+    private final int fixedCanvasSize = 510;
 
     public DrawPanel(JPanel mainContainer, CardLayout cardLayout, Font baseFont) {
-
+        this.controller = new DrawController();
         setLayout(new BorderLayout());
 
         JPanel topPanel = getJPanel(mainContainer, cardLayout, baseFont);
         add(topPanel, BorderLayout.NORTH);
 
-        JPanel palettePanel = new JPanel();
-        palettePanel.setLayout(new BoxLayout(palettePanel, BoxLayout.Y_AXIS));
-        palettePanel.setBackground(PALETTE_BG);
-        palettePanel.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(PALETTE_BORDER, 4, true),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
+        // палітра інструментів
+        ToolBar palettePanel = new ToolBar(controller, this, baseFont);
 
-        JLabel paletteTitle = new JLabel("ІНСТРУМЕНТИ");
-        paletteTitle.setFont(baseFont.deriveFont(11f));
-        paletteTitle.setForeground(TEXT_COLOR);
-        paletteTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        palettePanel.add(paletteTitle);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        // індикатор поточного кольору
-        JPanel colorIndicator = new JPanel();
-        colorIndicator.setBackground(selectedColor);
-        colorIndicator.setPreferredSize(new Dimension(60, 60));
-        colorIndicator.setMaximumSize(new Dimension(60, 60));
-        colorIndicator.setBorder(new LineBorder(TEXT_COLOR, 3));
-        colorIndicator.setAlignmentX(Component.CENTER_ALIGNMENT);
-        palettePanel.add(colorIndicator);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        JButton chooseColorBtn = createToolButton("ОБРАТИ КОЛІР", TEXT_COLOR, baseFont);
-        chooseColorBtn.setBackground(new Color(245, 235, 215));
-        chooseColorBtn.setForeground(TEXT_COLOR);
-        chooseColorBtn.addActionListener(e -> {
-            Color chosen = JColorChooser.showDialog(this, "Оберіть колір", selectedColor);
-            if (chosen != null) {
-                selectedColor = chosen;
-                colorIndicator.setBackground(selectedColor);
-                isEraserActive = false;
-                colorIndicator.setBorder(new LineBorder(Color.WHITE, 3));
-            }
-        });
-
-        // гумка
-        JButton eraserBtn = createToolButton("ГУМКА", TEXT_COLOR, baseFont);
-        eraserBtn.setBackground(CANVAS_COLOR);
-        eraserBtn.setForeground(TEXT_COLOR);
-
-        eraserBtn.addActionListener(e -> {
-            isEraserActive = !isEraserActive;
-
-            if (isEraserActive) {
-                eraserBtn.setBorder(new LineBorder(new Color(60, 189, 209), 3));
-                colorIndicator.setBorder(new LineBorder(TEXT_COLOR, 3));
-            } else {
-                eraserBtn.setBorder(new LineBorder(TEXT_COLOR, 3));
-                colorIndicator.setBorder(new LineBorder(Color.WHITE, 3));
-            }
-        });
-        chooseColorBtn.addActionListener(e -> eraserBtn.setBorder(new LineBorder(TEXT_COLOR, 3)));
-
-        // очистити
-        JButton clearBtn = createToolButton("ОЧИСТИТИ", TEXT_COLOR, baseFont);
-        clearBtn.setBackground(new Color(255, 210, 210));
-        clearBtn.setForeground(TEXT_COLOR);
-        clearBtn.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Повністю очистити полотно?",
-                    "Очищення", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                clearGrid();
-                repaint();
-            }
-        });
-        palettePanel.add(chooseColorBtn);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        palettePanel.add(eraserBtn);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        palettePanel.add(clearBtn);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        JButton saveBtn = createToolButton("ЗБЕРЕГТИ", TEXT_COLOR, baseFont);
-        saveBtn.setBackground(new Color(202, 238, 248)); // Блакитний колір, як у головному меню
-        saveBtn.setForeground(TEXT_COLOR);
-
-        saveBtn.addActionListener(e -> ImageSaver.savePanelAsPNG(this));
-        palettePanel.add(saveBtn);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        // симетрія
-        JLabel symmetryTitle = new JLabel("СИМЕТРІЯ");
-        symmetryTitle.setFont(baseFont.deriveFont(11f));
-        symmetryTitle.setForeground(TEXT_COLOR);
-        symmetryTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        palettePanel.add(symmetryTitle);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 5)));
-
-        // горизонтальна симетрія
-        JCheckBox horizCheck = new JCheckBox("горизонтальна");
-        horizCheck.setFont(baseFont.deriveFont(12f));
-        horizCheck.setForeground(TEXT_COLOR);
-        horizCheck.setOpaque(false);
-        horizCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizCheck.addActionListener(e -> isHorizSymActive = horizCheck.isSelected());
-
-        // вертикальна симетрія
-        JCheckBox vertCheck = new JCheckBox("вертикальна");
-        vertCheck.setFont(baseFont.deriveFont(12f));
-        vertCheck.setForeground(TEXT_COLOR);
-        vertCheck.setOpaque(false);
-        vertCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
-        vertCheck.addActionListener(e -> isVertSymActive = vertCheck.isSelected());
-
-        palettePanel.add(horizCheck);
-        palettePanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        palettePanel.add(vertCheck);
-
-        //палітра
         JPanel paletteWrapper = new JPanel(new GridBagLayout());
         paletteWrapper.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 20, 0, 40);
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.weighty = 1.0;
+        gbc.insets = new Insets(1, 20, 0, 30);
         paletteWrapper.add(palettePanel, gbc);
+
         add(paletteWrapper, BorderLayout.EAST);
 
-        addMouseListener(new MouseAdapter() {
+        // рух мишки
+        MouseAdapter mouseHandler = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                drawAtPoint(e.getX(), e.getY());
+                triggerDraw(e.getX(), e.getY());
             }
-        });
 
-        addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                drawAtPoint(e.getX(), e.getY());
+                triggerDraw(e.getX(), e.getY());
             }
-        });
-
-        clearGrid(); // чисте поле
+        };
+        addMouseListener(mouseHandler);
+        addMouseMotionListener(mouseHandler);
     }
 
-    private void clearGrid() {
-        for (int row = 0; row < GRID_COUNT; row++) {
-            for (int col = 0; col < GRID_COUNT; col++) {
-                grid[row][col] = 0;
-            }
-        }
-    }
-
-    private void drawAtPoint(int mouseX, int mouseY) {
-        int gridTotalSize = GRID_COUNT * cellSize;
-        int offsetX = (getWidth() - gridTotalSize) / 2;
-        int offsetY = (getHeight() - gridTotalSize) / 2;
-
-        int col = (mouseX - offsetX) / cellSize;
-        int row = (mouseY - offsetY) / cellSize;
-
-        if (col >= 0 && col < GRID_COUNT && row >= 0 && row < GRID_COUNT) {
-            int valueToSet = isEraserActive ? 0 : selectedColor.getRGB();
-
-            // основна точка
-            grid[row][col] = valueToSet;
-
-            // дзеркало по горизонталі (ліво право)
-            if (isHorizSymActive) {
-                int mirrorCol = GRID_COUNT - 1 - col;
-                grid[row][mirrorCol] = valueToSet;
-            }
-
-            // дзеркало по вертикалі (верх низ)
-            if (isVertSymActive) {
-                int mirrorRow = GRID_COUNT - 1 - row;
-                grid[mirrorRow][col] = valueToSet;
-            }
-
-            // разом
-            if (isHorizSymActive && isVertSymActive) {
-                int mirrorCol = GRID_COUNT - 1 - col;
-                int mirrorRow = GRID_COUNT - 1 - row;
-                grid[mirrorRow][mirrorCol] = valueToSet;
-            }
-
-            repaint();
-        }
+    private void triggerDraw(int mouseX, int mouseY) {
+        int offsetX = (getWidth() - fixedCanvasSize) / 2;
+        int offsetY = (getHeight() - fixedCanvasSize) / 2;
+        controller.handleDraw(mouseX, mouseY, offsetX, offsetY, fixedCanvasSize);
+        repaint();
     }
 
     private JPanel getJPanel(JPanel mainContainer, CardLayout cardLayout, Font baseFont) {
@@ -218,30 +62,15 @@ public class DrawPanel extends JPanel {
         label.setFont(baseFont.deriveFont(20f));
         label.setForeground(TEXT_COLOR);
 
-        String menuItem = "Назад";
-        Font menuFont = baseFont.deriveFont(14f);
-        JButton backBtn = Capabilities.createPixelButton(menuItem, menuFont);
+        JButton backBtn = Capabilities.statButton("Назад", baseFont.deriveFont(13f));
         backBtn.setFocusPainted(false);
+        backBtn.setMaximumSize(new Dimension(100, 35));
+        backBtn.setPreferredSize(new Dimension(100, 35));
         backBtn.addActionListener(e -> cardLayout.show(mainContainer, "MAIN"));
         topPanel.add(label);
         topPanel.add(backBtn);
         return topPanel;
     }
-
-    private JButton createToolButton(String text, Color borderCol, Font font) {
-        JButton btn = new JButton(text);
-        btn.setFont(font.deriveFont(10f));
-        btn.setOpaque(true);
-        btn.setContentAreaFilled(true);
-        btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorder(new LineBorder(borderCol, 2));
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setMaximumSize(new Dimension(150, 40));
-        btn.setPreferredSize(new Dimension(150, 40));
-        return btn;
-    }
-
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -249,38 +78,62 @@ public class DrawPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int gridTotalSize = GRID_COUNT * cellSize;
-        int offsetX = (getWidth() - gridTotalSize) / 2;
-        int offsetY = (getHeight() - gridTotalSize) / 2;
+        int offsetX = (getWidth() - fixedCanvasSize) / 2;
+        int offsetY = (getHeight() - fixedCanvasSize) / 2;
 
         g2.setColor(CANVAS_COLOR);
-        g2.fillRect(offsetX - 20, offsetY - 20, gridTotalSize + 40, gridTotalSize + 40);
+        g2.fillRect(offsetX - 20, offsetY - 20, fixedCanvasSize + 40, fixedCanvasSize + 40);
 
-        for (int row = 0; row < GRID_COUNT; row++) {
-            for (int col = 0; col < GRID_COUNT; col++) {
-                int x = offsetX + col * cellSize;
-                int y = offsetY + row * cellSize;
+        int gridCount = controller.getGridCount();
+        int[][] grid = controller.getGrid();
+        double exactCellSize = (double) fixedCanvasSize / gridCount;
+
+        // сітка
+        for (int row = 0; row < gridCount; row++) {
+            for (int col = 0; col < gridCount; col++) {
+                int x = (int) Math.round(offsetX + col * exactCellSize);
+                int y = (int) Math.round(offsetY + row * exactCellSize);
+                int currentCellSize = (int) Math.round((col + 1) * exactCellSize) - (int) Math.round(col * exactCellSize);
 
                 g2.setColor(HOLE_COLOR);
                 g2.fillOval(x - 2, y - 2, 4, 4);
 
                 if (grid[row][col] != 0) {
                     Color crossColor = new Color(grid[row][col]);
-                    PatternPanel.cross(g2, x, y, cellSize, crossColor);
-
+                    drawAdaptiveCross(g2, x, y, currentCellSize, crossColor);
                 }
             }
         }
-        PatternPanel.hole(g2, offsetX, offsetY, cellSize, gridTotalSize);
+
+        // точки
+        g2.setColor(HOLE_COLOR);
+        for (int i = 0; i <= gridCount; i++) {
+            int pos = (int) Math.round(i * exactCellSize);
+            g2.fillOval(offsetX + fixedCanvasSize - 2, offsetY + pos - 2, 4, 4);
+            g2.fillOval(offsetX + pos - 2, offsetY + fixedCanvasSize - 2, 4, 4);
+        }
+        g2.setStroke(new BasicStroke(2));
     }
 
+    private void drawAdaptiveCross(Graphics2D g2, int x, int y, int size, Color crossColor) {
+        Color shadowColor = new Color(crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), 80);
+        g2.setColor(shadowColor);
+        g2.fillRect(x + 2, y + 2, size - 3, size - 3);
+
+        g2.setColor(crossColor);
+        int strokeThickness = Math.max(2, size / 4);
+        int padding = Math.max(2, size / 5);
+
+        g2.setStroke(new BasicStroke(strokeThickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawLine(x + padding, y + padding, x + size - padding, y + size - padding);
+        g2.drawLine(x + size - padding, y + padding, x + padding, y + size - padding);
+    }
+
+    // завантаження файла
     public void loadGridData(int[][] loadedData) {
         if (loadedData != null) {
-            for (int row = 0; row < GRID_COUNT; row++) {
-                System.arraycopy(loadedData[row], 0, this.grid[row], 0, GRID_COUNT);
-            }
+            controller.setGrid(loadedData);
             repaint();
         }
     }
-
 }
