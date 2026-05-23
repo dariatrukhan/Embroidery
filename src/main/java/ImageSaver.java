@@ -110,7 +110,7 @@ public class ImageSaver {
                 return loadedGrid;
 
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(parent, "Помилка при читанні файлу: " + ex.getMessage(), "Помилка", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parent, "Помилка при читанні файла: " + ex.getMessage(), "Помилка", JOptionPane.ERROR_MESSAGE);
             }
         }
         return null;

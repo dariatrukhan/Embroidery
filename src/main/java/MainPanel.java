@@ -11,7 +11,7 @@ public class MainPanel extends JFrame {
     public MainPanel() {
         super("Вишиванка | Трухан Дарʼя");
         initWindow();
-        loadCustomFont();
+        CustomFont();
         buildUI();
     }
 
@@ -22,10 +22,11 @@ public class MainPanel extends JFrame {
         setSize(900, screenSize.height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
     }
 
     // шрифт
-    private void loadCustomFont() {
+    private void CustomFont() {
         try {
             File fontFile = new File("src/fonts/PressStart2P-Regular.ttf");
             customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile).deriveFont(58f);

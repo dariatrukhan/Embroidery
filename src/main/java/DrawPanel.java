@@ -24,9 +24,7 @@ public class DrawPanel extends JPanel {
         JPanel paletteWrapper = new JPanel(new GridBagLayout());
         paletteWrapper.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTH;
-        gbc.weighty = 1.0;
-        gbc.insets = new Insets(1, 20, 0, 30);
+        gbc.insets = new Insets(0, 20, 100, 30);
         paletteWrapper.add(palettePanel, gbc);
 
         add(paletteWrapper, BorderLayout.EAST);
@@ -48,14 +46,14 @@ public class DrawPanel extends JPanel {
     }
 
     private void triggerDraw(int mouseX, int mouseY) {
-        int offsetX = (getWidth() - fixedCanvasSize) / 2;
+        int offsetX = 50;
         int offsetY = (getHeight() - fixedCanvasSize) / 2;
         controller.handleDraw(mouseX, mouseY, offsetX, offsetY, fixedCanvasSize);
-        repaint();
+        this.repaint(offsetX, offsetY, fixedCanvasSize, fixedCanvasSize);
     }
 
     private JPanel getJPanel(JPanel mainContainer, CardLayout cardLayout, Font baseFont) {
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 15));
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 40, 15));
         topPanel.setOpaque(false);
 
         JLabel label = new JLabel("Режим малювання");
@@ -78,7 +76,7 @@ public class DrawPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int offsetX = (getWidth() - fixedCanvasSize) / 2;
+        int offsetX = 50;
         int offsetY = (getHeight() - fixedCanvasSize) / 2;
 
         g2.setColor(CANVAS_COLOR);

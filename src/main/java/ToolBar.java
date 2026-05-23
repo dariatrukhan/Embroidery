@@ -20,8 +20,8 @@ public class ToolBar extends JPanel {
                 new LineBorder(PALETTE_BORDER, 3),
                 BorderFactory.createEmptyBorder(20, -1, 20, -1)
         ));
-        setMaximumSize(new Dimension(250, 530));
-        setPreferredSize(new Dimension(250, 530));
+        setMaximumSize(new Dimension(220, 510));
+        setPreferredSize(new Dimension(220, 510));
 
 //———————————————————ЗАГОЛОВОК
         JLabel paletteTitle = new JLabel("ІНСТРУМЕНТИ");
