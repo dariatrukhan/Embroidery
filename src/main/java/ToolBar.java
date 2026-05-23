@@ -20,8 +20,8 @@ public class ToolBar extends JPanel {
                 new LineBorder(PALETTE_BORDER, 3),
                 BorderFactory.createEmptyBorder(20, -1, 20, -1)
         ));
-        setMaximumSize(new Dimension(220, 510));
-        setPreferredSize(new Dimension(220, 510));
+        setMaximumSize(new Dimension(220, 500));
+        setPreferredSize(new Dimension(220, 500));
 
 //———————————————————ЗАГОЛОВОК
         JLabel paletteTitle = new JLabel("ІНСТРУМЕНТИ");
@@ -63,6 +63,45 @@ public class ToolBar extends JPanel {
                 colorIndicator.setBorder(new LineBorder(Color.WHITE, 3));
             }
         });
+
+//———————————————————ПІПЕТКА
+        JButton pipetteBtn = createToolButton("ПІПЕТКА", TEXT_COL, baseFont);
+        pipetteBtn.setBackground(CANVAS_COL);
+        pipetteBtn.setForeground(TEXT_COL);
+
+        pipetteBtn.addActionListener(e -> {
+            canvasPanel.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+            pipetteBtn.setBackground(new Color(175, 230, 245));
+
+            java.awt.event.MouseListener pipetteListener = new java.awt.event.MouseAdapter() {
+                @Override
+                public void mousePressed(java.awt.event.MouseEvent pip) {
+                    try {
+                        Robot robot = new Robot();
+                        Point screenLocation = pip.getLocationOnScreen();
+                        Color pickedColor = robot.getPixelColor(screenLocation.x, screenLocation.y);
+
+                        controller.setSelectedColor(pickedColor);
+                        colorIndicator.setBackground(pickedColor);
+                        controller.setEraserActive(false);
+                        colorIndicator.setBorder(new LineBorder(Color.WHITE, 3));
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        canvasPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                        pipetteBtn.setBackground(CANVAS_COL);
+
+                        canvasPanel.removeMouseListener(this);
+                        canvasPanel.repaint();
+                        repaint();
+                    }
+                }
+            };
+            canvasPanel.addMouseListener(pipetteListener);
+        });
+        add(pipetteBtn);
+        add(Box.createRigidArea(new Dimension(0, 10)));
 
 //———————————————————ГУМКА
         JButton eraserBtn = createToolButton("ГУМКА", TEXT_COL, baseFont);
@@ -107,8 +146,9 @@ public class ToolBar extends JPanel {
         add(sizeTitle);
         add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JPanel sizeBtnPanel = new JPanel(new GridLayout(1, 3, -1, 0));
+        JPanel sizeBtnPanel = new JPanel(new GridLayout(1, 3, -2, 0));
         sizeBtnPanel.setOpaque(false);
+        sizeBtnPanel.setPreferredSize(new Dimension(140, 35));
         sizeBtnPanel.setMaximumSize(new Dimension(140, 27));
 
         JButton size17 = new JButton("17");
