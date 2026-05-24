@@ -15,6 +15,12 @@ public class DrawPanel extends JPanel {
         this.controller = new DrawController();
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
+        initUIComponents(mainContainer, cardLayout, baseFont);
+        setupKeyBindings();
+        setupMouseHandlers();
+    }
+
+    private void initUIComponents(JPanel mainContainer, CardLayout cardLayout, Font baseFont) {
         JPanel topPanel = getJPanel(mainContainer, cardLayout, baseFont);
         add(topPanel, BorderLayout.NORTH);
 
@@ -27,23 +33,6 @@ public class DrawPanel extends JPanel {
         paletteWrapper.add(palettePanel, gbc);
 
         add(paletteWrapper, BorderLayout.EAST);
-
-        setupKeyBindings();
-
-        MouseAdapter mouseHandler = new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                controller.saveStateToUndo();
-                triggerDraw(e.getX(), e.getY());
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                triggerDraw(e.getX(), e.getY());
-            }
-        };
-        addMouseListener(mouseHandler);
-        addMouseMotionListener(mouseHandler);
     }
 
     private void setupKeyBindings() {
@@ -78,6 +67,22 @@ public class DrawPanel extends JPanel {
         });
     }
 
+    private void setupMouseHandlers() {
+        MouseAdapter mouseHandler = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                controller.saveStateToUndo();
+                triggerDraw(e.getX(), e.getY());
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                triggerDraw(e.getX(), e.getY());
+            }
+        };
+        addMouseListener(mouseHandler);
+        addMouseMotionListener(mouseHandler);
+    }
     private void triggerDraw(int mouseX, int mouseY) {
         int rows = controller.getRowsCount();
         int cols = controller.getColsCount();

@@ -355,8 +355,6 @@ public class ToolBar extends JPanel {
                 int width = (int) widthSpinner.getValue();
                 int height = (int) heightSpinner.getValue();
                 controller.changeGridSize(height, width);
-                if (canvasPanel instanceof DrawPanel) {
-                }
                 canvasPanel.repaint();
             }
         }
