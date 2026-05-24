@@ -57,7 +57,7 @@ public class DrawPanel extends JPanel {
         int gridTotalHeight = (int) Math.round(rows * exactCellSize);
 
         int offsetX = (getWidth() - gridTotalWidth - 250) / 2;
-        int offsetY = (getHeight() - gridTotalHeight + 40) / 2;
+        int offsetY = (getHeight() - gridTotalHeight - 10) / 2;
 
         controller.handleDraw(mouseX, mouseY, offsetX, offsetY, fixedCanvasSize);
         repaint();
@@ -134,7 +134,7 @@ public class DrawPanel extends JPanel {
         int gridTotalHeight = (int) Math.round(rows * exactCellSize);
 
         int offsetX = (getWidth() - gridTotalWidth - 250) / 2;
-        int offsetY = (getHeight() - gridTotalHeight + 40) / 2;
+        int offsetY = (getHeight() - gridTotalHeight - 10) / 2;
 
         g2.setColor(CANVAS_COLOR);
         g2.fillRect(offsetX - 20, offsetY - 20, gridTotalWidth + 40, gridTotalHeight + 40);
