@@ -57,17 +57,16 @@ public class DrawController {
         }
         return false;
     }
-
-    public void clearHistory() {
-        undoStack.clear();
-        redoStack.clear();
-    }
     public void changeGridSize(int newRows, int newCols) {
-        clearHistory();
+        saveStateToUndo();
         this.rowsCount = newRows;
         this.colsCount = newCols;
         this.grid = new int[rowsCount][colsCount];
-        clearGrid();
+        for (int row = 0; row < rowsCount; row++) {
+            for (int col = 0; col < colsCount; col++) {
+                grid[row][col] = 0;
+            }
+        }
     }
 
     public void clearGrid() {
@@ -162,6 +161,14 @@ public class DrawController {
         this.rowsCount = newGrid.length;
         this.colsCount = newGrid[0].length;
     }
+    public boolean isGridEmpty() {
+        for (int r = 0; r < rowsCount; r++) {
+            for (int c = 0; c < colsCount; c++) {
+                if (grid[r][c] != 0) return false;
+            }
+        }
+        return true;
+    }
     public int getRowsCount() { return rowsCount; }
     public int getColsCount() { return colsCount; }
     public Color getSelectedColor() { return selectedColor; }
@@ -171,7 +178,6 @@ public class DrawController {
     public void setHorActive(boolean active) { HorActive = active; }
     public void setVerActive(boolean active) { VerActive = active; }
     public void setRepeatActive(boolean active) { this.RepeatActive = active; }
-    public int getRepeatStep() { return repeatStep; }
     public void setRepeatStep(int step) { this.repeatStep = step; }
     public void setGridCount(int patternGridSize) { this.rowsCount = patternGridSize; this.colsCount = patternGridSize; }
 }
