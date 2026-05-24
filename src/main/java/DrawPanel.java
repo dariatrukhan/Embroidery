@@ -35,6 +35,7 @@ public class DrawPanel extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 triggerDraw(e.getX(), e.getY());
+                controller.saveStateToUndo();
             }
 
             @Override

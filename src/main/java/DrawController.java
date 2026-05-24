@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.Stack;
 
 public class DrawController {
     private int rowsCount = 17;
@@ -11,13 +12,59 @@ public class DrawController {
     private boolean VerActive = false;
 
     private boolean RepeatActive = false;
-    private int repeatStep = 5;
+    private int repeatStep = 1;
+
+    private final Stack<int[][]> undoStack = new Stack<>();
+    private final Stack<int[][]> redoStack = new Stack<>();
 
     public DrawController() {
         clearGrid();
     }
 
+    private int[][] copyGrid(int[][] original) {
+        int[][] copy = new int[original.length][original[0].length];
+        for (int i = 0; i < original.length; i++) {
+            System.arraycopy(original[i], 0, copy[i], 0, original[i].length);
+        }
+        return copy;
+    }
+
+    public void saveStateToUndo() {
+        undoStack.push(copyGrid(this.grid));
+        redoStack.clear();
+    }
+
+    public boolean undo() {
+        if (!undoStack.isEmpty()) {
+            redoStack.push(copyGrid(this.grid));
+            int[][] previousGrid = undoStack.pop();
+            this.grid = previousGrid;
+            this.rowsCount = previousGrid.length;
+            this.colsCount = previousGrid[0].length;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean redo() {
+        if (!redoStack.isEmpty()) {
+            undoStack.push(copyGrid(this.grid));
+            int[][] nextGrid = redoStack.pop();
+            this.grid = nextGrid;
+            this.rowsCount = nextGrid.length;
+            this.colsCount = nextGrid[0].length;
+            return true;
+        }
+        return false;
+    }
+
+    public void clearHistory() {
+        undoStack.clear();
+        redoStack.clear();
+    }
+
     public void changeGridSize(int newSize, int width) {
+        clearHistory();
         this.rowsCount = newSize;
         this.colsCount = newSize;
         this.grid = new int[rowsCount][colsCount];
@@ -25,6 +72,9 @@ public class DrawController {
     }
 
     public void clearGrid() {
+        if (grid != null) {
+            saveStateToUndo();
+        }
         for (int row = 0; row < rowsCount; row++) {
             for (int col = 0; col < colsCount; col++) {
                 grid[row][col] = 0;
@@ -40,6 +90,7 @@ public class DrawController {
         int row = (int) ((mouseY - offsetY) / exactCellSize);
 
         if (row >= 0 && row < rowsCount && col >= 0 && col < colsCount) {
+            //saveStateToUndo();
             int valueToSet = EraserActive ? 0 : selectedColor.getRGB();
 
             grid[row][col] = valueToSet;

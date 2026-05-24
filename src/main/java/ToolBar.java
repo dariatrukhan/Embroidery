@@ -229,9 +229,13 @@ public class ToolBar extends JPanel {
         stepLabel.setFont(baseFont.deriveFont(11f));
         stepLabel.setOpaque(false);
         stepLabel.setMargin(new Insets(0, 20, 0, 0));
-
-        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(5, 2, 20, 1);
+        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, 20, 1);
         JSpinner stepSpinner = new JSpinner(spinnerModel);
+        controller.setRepeatStep((int) spinnerModel.getValue() + 1);
+        stepSpinner.addChangeListener(e -> {
+            int spinnerValue = (int) stepSpinner.getValue();
+            controller.setRepeatStep(spinnerValue + 1);
+        });
         stepSpinner.setFont(baseFont.deriveFont(11f));
         stepSpinner.setPreferredSize(new Dimension(50, 30));
         stepSpinner.setEnabled(false);
@@ -278,6 +282,41 @@ public class ToolBar extends JPanel {
         add(btnDupVert);
         add(Box.createRigidArea(new Dimension(0, 8)));
         add(btnDupHor);
+        add(Box.createRigidArea(new Dimension(0, 8)));
+// ———————————————————————UNDO / REDO
+        JPanel undoRedoPanel = new JPanel(new GridLayout(1, 2, 5, 0));
+        undoRedoPanel.setOpaque(false);
+        undoRedoPanel.setMaximumSize(new Dimension(150, 40));
+
+        JButton undoButton = new JButton("◀");
+        undoButton.setFont(baseFont.deriveFont(9f));
+        undoButton.setForeground(TEXT_COL);
+        undoButton.setBackground(new Color(235, 225, 205));
+        undoButton.setFocusPainted(false);
+        undoButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JButton redoButton = new JButton("▶");
+        redoButton.setFont(baseFont.deriveFont(9f));
+        redoButton.setForeground(TEXT_COL);
+        redoButton.setBackground(new Color(235, 225, 205));
+        redoButton.setFocusPainted(false);
+        redoButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        undoButton.addActionListener(e -> {
+            if (controller.undo()) {
+                canvasPanel.repaint();
+            }
+        });
+
+        redoButton.addActionListener(e -> {
+            if (controller.redo()) {
+                canvasPanel.repaint();
+            }
+        });
+        undoRedoPanel.add(undoButton);
+        undoRedoPanel.add(redoButton);
+        add(undoRedoPanel);
+        add(Box.createRigidArea(new Dimension(0, 5)));
     }
     private void showSizeChooser() {
         SpinnerNumberModel widthModel = new SpinnerNumberModel(controller.getColsCount(), 17, 68, 1);
