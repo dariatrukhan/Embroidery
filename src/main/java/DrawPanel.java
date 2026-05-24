@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -24,7 +25,7 @@ public class DrawPanel extends JPanel {
         JPanel paletteWrapper = new JPanel(new GridBagLayout());
         paletteWrapper.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 20, 100, 30);
+        gbc.insets = new Insets(0, 20, 0, 30);
         paletteWrapper.add(palettePanel, gbc);
 
         add(paletteWrapper, BorderLayout.EAST);
@@ -68,11 +69,35 @@ public class DrawPanel extends JPanel {
         JLabel label = new JLabel("Режим малювання");
         label.setFont(baseFont.deriveFont(20f));
         label.setForeground(TEXT_COLOR);
-
         JButton backBtn = Capabilities.statButton("Назад", baseFont.deriveFont(13f));
-        backBtn.setFocusPainted(false);
-        backBtn.setMaximumSize(new Dimension(100, 35));
-        backBtn.setPreferredSize(new Dimension(100, 35));
+        backBtn.setFocusPainted(true);
+
+        backBtn.setOpaque(false);
+        backBtn.setContentAreaFilled(false);
+
+        Color normalText = new Color(0x075767);
+        Color themeColor = new Color(0x448695);
+        Color themeColor2 = new Color(0xA4D3D8);
+
+        backBtn.setForeground(normalText);
+        backBtn.setBorder(new LineBorder(themeColor, 2));
+        backBtn.setMaximumSize(new Dimension(100, 25));
+        backBtn.setPreferredSize(new Dimension(100, 25));
+
+        backBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                backBtn.setForeground(themeColor);
+                backBtn.setBorder(new LineBorder(themeColor2, 2));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                backBtn.setForeground(normalText);
+                backBtn.setBorder(new LineBorder(themeColor, 2));
+            }
+        });
+
         backBtn.addActionListener(e -> cardLayout.show(mainContainer, "MAIN"));
         topPanel.add(label);
         topPanel.add(backBtn);

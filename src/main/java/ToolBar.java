@@ -18,18 +18,18 @@ public class ToolBar extends JPanel {
         setBackground(new Color(225, 215, 195));
         setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(PALETTE_BORDER, 3),
-                BorderFactory.createEmptyBorder(20, -1, 20, -1)
+                BorderFactory.createEmptyBorder(15, -1, 0, -1)
         ));
-        setMaximumSize(new Dimension(220, 500));
-        setPreferredSize(new Dimension(220, 500));
+        setMaximumSize(new Dimension(220, 610));
+        setPreferredSize(new Dimension(220, 610));
 
 //———————————————————ЗАГОЛОВОК
         JLabel paletteTitle = new JLabel("ІНСТРУМЕНТИ");
-        paletteTitle.setFont(baseFont.deriveFont(13f));
         paletteTitle.setForeground(TEXT_COL);
+        paletteTitle.setFont(baseFont.deriveFont(13f));
         paletteTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(paletteTitle);
-        add(Box.createRigidArea(new Dimension(0, 15)));
+        add(Box.createRigidArea(new Dimension(0, 10)));
 
 //———————————————————ЛІНІЯ
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
@@ -53,7 +53,6 @@ public class ToolBar extends JPanel {
 //———————————————————ОБРАТИ КОЛІР
         JButton chooseColorBtn = createToolButton("ОБРАТИ КОЛІР", TEXT_COL, baseFont);
         chooseColorBtn.setBackground(CANVAS_COL);
-        chooseColorBtn.setForeground(TEXT_COL);
         chooseColorBtn.addActionListener(e -> {
             Color chosen = JColorChooser.showDialog(this, "Оберіть колір", controller.getSelectedColor());
             if (chosen != null) {
@@ -67,7 +66,6 @@ public class ToolBar extends JPanel {
 //———————————————————ПІПЕТКА
         JButton pipetteBtn = createToolButton("ПІПЕТКА", TEXT_COL, baseFont);
         pipetteBtn.setBackground(CANVAS_COL);
-        pipetteBtn.setForeground(TEXT_COL);
 
         pipetteBtn.addActionListener(e -> {
             canvasPanel.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
@@ -106,23 +104,37 @@ public class ToolBar extends JPanel {
 //———————————————————ГУМКА
         JButton eraserBtn = createToolButton("ГУМКА", TEXT_COL, baseFont);
         eraserBtn.setBackground(CANVAS_COL);
-        eraserBtn.setForeground(TEXT_COL);
+
+        eraserBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            private final Color activeBlueBorder = new Color(60, 189, 209);
+            private final Color hoverColor = new Color(184, 143, 89);
+
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                eraserBtn.setBorder(new LineBorder(hoverColor, 2));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                if (controller.EraserActive()) {
+                    eraserBtn.setBorder(new LineBorder(activeBlueBorder, 3));
+                } else {
+                    eraserBtn.setBorder(new LineBorder(TEXT_COL, 2));
+                }
+            }
+        });
         eraserBtn.addActionListener(e -> {
             controller.setEraserActive(!controller.EraserActive());
             if (controller.EraserActive()) {
                 eraserBtn.setBorder(new LineBorder(new Color(60, 189, 209), 3));
-                colorIndicator.setBorder(new LineBorder(TEXT_COL, 3));
+                colorIndicator.setBorder(new LineBorder(TEXT_COL, 2));
             } else {
-                eraserBtn.setBorder(new LineBorder(TEXT_COL, 3));
-                colorIndicator.setBorder(new LineBorder(Color.WHITE, 3));
+                eraserBtn.setBorder(new LineBorder(TEXT_COL, 2));
             }
         });
-        chooseColorBtn.addActionListener(e -> eraserBtn.setBorder(new LineBorder(TEXT_COL, 3)));
-
 //———————————————————ОЧИСТИТИ
         JButton clearBtn = createToolButton("ОЧИСТИТИ", TEXT_COL, baseFont);
         clearBtn.setBackground(new Color(255, 210, 210));
-        clearBtn.setForeground(TEXT_COL);
         clearBtn.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, "Повністю очистити полотно?", "Очистити", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
@@ -139,7 +151,7 @@ public class ToolBar extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 15)));
 
 //———————————————————РОЗМІР ПОЛОТНА
-        JButton sizeBtn = createToolButton("РОЗМІР ПОЛОТНА", PALETTE_BORDER, baseFont);
+        JButton sizeBtn = createToolButton("РОЗМІР ПОЛОТНА", TEXT_COL, baseFont);
         sizeBtn.addActionListener(e -> showSizeChooser());
         add(sizeBtn);
         add(Box.createRigidArea(new Dimension(0, 10)));
@@ -147,59 +159,81 @@ public class ToolBar extends JPanel {
 //———————————————————ЗБЕРЕГТИ
         JButton saveBtn = createToolButton("ЗБЕРЕГТИ", TEXT_COL, baseFont);
         saveBtn.setBackground(new Color(202, 238, 248));
-        saveBtn.setForeground(TEXT_COL);
         saveBtn.addActionListener(e -> {
             ImageSaver.savePanelAsPNG(this, controller);
         });
         add(saveBtn);
         add(Box.createRigidArea(new Dimension(0, 15)));
 
+//———————————————————ЛІНІЯ
+        JSeparator separator1 = new JSeparator(SwingConstants.HORIZONTAL);
+        separator1.setMaximumSize(new Dimension(Short.MAX_VALUE, 10));
+        separator1.setForeground(PALETTE_BORDER);
+        separator1.setBackground(PALETTE_BORDER);
+        separator1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(separator1);
+        add(Box.createRigidArea(new Dimension(0, 15)));
+
 //——————————————————КНОПКИ СИМЕТРІЇ
         JLabel symmetryTitle = new JLabel("СИМЕТРІЯ");
         symmetryTitle.setFont(baseFont.deriveFont(11f));
-        symmetryTitle.setForeground(TEXT_COL);
+        symmetryTitle.setForeground(new Color(5, 83, 97));
         symmetryTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(symmetryTitle);
         add(Box.createRigidArea(new Dimension(0, 5)));
 
         JCheckBox horizCheck = new JCheckBox("горизонтальна");
         horizCheck.setFont(baseFont.deriveFont(12f));
-        horizCheck.setForeground(TEXT_COL);
         horizCheck.setOpaque(false);
+        horizCheck.setForeground(TEXT_COL);
         horizCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
         horizCheck.addActionListener(e -> controller.setHorActive(horizCheck.isSelected()));
 
         JCheckBox vertCheck = new JCheckBox("вертикальна");
         vertCheck.setFont(baseFont.deriveFont(12f));
-        vertCheck.setForeground(TEXT_COL);
         vertCheck.setOpaque(false);
+        vertCheck.setForeground(TEXT_COL);
         vertCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
+        vertCheck.setMargin(new Insets(0, 0, 0, 25));
         vertCheck.addActionListener(e -> controller.setVerActive(vertCheck.isSelected()));
 
         add(horizCheck);
         add(Box.createRigidArea(new Dimension(0, 5)));
         add(vertCheck);
+//———————————————————ЛІНІЯ
+        JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
+        separator2.setMaximumSize(new Dimension(Short.MAX_VALUE, 10));
+        separator2.setForeground(PALETTE_BORDER);
+        separator2.setBackground(PALETTE_BORDER);
+        separator2.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(separator2);
+        add(Box.createRigidArea(new Dimension(0, 15)));
 
 //———————————————————ДУБЛЮВАННЯ
-        add(Box.createRigidArea(new Dimension(0, 15)));
         JLabel repeatTitle = new JLabel("ДУБЛЮВАННЯ");
         repeatTitle.setFont(baseFont.deriveFont(11f));
-        repeatTitle.setForeground(TEXT_COL);
+        repeatTitle.setForeground(new Color(101, 37, 5));
         repeatTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(repeatTitle);
         add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JPanel stepPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        JPanel stepPanel = new JPanel(new GridBagLayout());
         stepPanel.setOpaque(false);
+        stepPanel.setMaximumSize(new Dimension(150, 30));
 
-        JCheckBox stepLabel = new JCheckBox("Крок:");
+        GridBagConstraints gbcStep = new GridBagConstraints();
+        gbcStep.fill = GridBagConstraints.VERTICAL;
+        gbcStep.gridy = 0;
+
+        JCheckBox stepLabel = new JCheckBox("Крок");
         stepLabel.setFont(baseFont.deriveFont(11f));
-        stepLabel.setForeground(TEXT_COL);
+        stepLabel.setOpaque(false);
+        stepLabel.setMargin(new Insets(0, 20, 0, 0));
 
-        SpinnerModel spinnerModel = new SpinnerNumberModel(controller.getRepeatStep(), 5, 15, 1);
+        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(5, 2, 20, 1);
         JSpinner stepSpinner = new JSpinner(spinnerModel);
         stepSpinner.setFont(baseFont.deriveFont(11f));
-        stepSpinner.setPreferredSize(new Dimension(50, 22));
+        stepSpinner.setPreferredSize(new Dimension(50, 30));
         stepSpinner.setEnabled(false);
 
         stepLabel.addActionListener(e -> {
@@ -213,27 +247,34 @@ public class ToolBar extends JPanel {
             controller.setRepeatStep(newStep);
         });
 
-        stepPanel.add(stepLabel);
-        stepPanel.add(stepSpinner);
+        gbcStep.gridx = 0;
+        gbcStep.weightx = 0.0;
+        gbcStep.insets = new Insets(0, 0, 0, 0);
+        stepPanel.add(stepLabel, gbcStep);
 
-        add(stepLabel);
-        add(Box.createRigidArea(new Dimension(0, 5)));
+        gbcStep.gridx = 1;
+        gbcStep.weightx = 1;
+        gbcStep.insets = new Insets(0, 0, 0, 0);
+        stepPanel.add(stepSpinner, gbcStep);
+
         add(stepPanel);
 
 //———————————————————КНОПКИ ДУБЛЮВАННЯ
-        JButton btnDupVert = createToolButton("вертикально", TEXT_COL, baseFont);
+        JButton btnDupVert = createToolButton("вертикально", PALETTE_BORDER, baseFont);
+        btnDupVert.setFont(baseFont.deriveFont(10f));
         btnDupVert.addActionListener(e -> {
             controller.duplicateVertically();
             canvasPanel.repaint();
         });
 
         JButton btnDupHor = createToolButton("горизонтально", PALETTE_BORDER, baseFont);
+        btnDupHor.setFont(baseFont.deriveFont(10f));
         btnDupHor.addActionListener(e -> {
             controller.duplicateHorizontally();
             canvasPanel.repaint();
         });
 
-        add(Box.createRigidArea(new Dimension(0, 15)));
+        add(Box.createRigidArea(new Dimension(0, 10)));
         add(btnDupVert);
         add(Box.createRigidArea(new Dimension(0, 8)));
         add(btnDupHor);
@@ -276,6 +317,7 @@ public class ToolBar extends JPanel {
     private JButton createToolButton(String text, Color borderCol, Font font) {
         JButton btn = new JButton(text);
         btn.setFont(font.deriveFont(10f));
+        btn.setForeground(TEXT_COL);
         btn.setOpaque(true);
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -283,6 +325,19 @@ public class ToolBar extends JPanel {
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setMaximumSize(new Dimension(150, 40));
         btn.setPreferredSize(new Dimension(150, 40));
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBorder(new LineBorder(new Color(184, 143, 89), 2));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBorder(new LineBorder(borderCol, 2));
+            }
+        });
+
         return btn;
     }
 }
