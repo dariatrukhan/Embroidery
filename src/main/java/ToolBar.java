@@ -62,12 +62,12 @@ public class ToolBar extends JPanel {
                 colorIndicator.setBorder(new LineBorder(Color.WHITE, 3));
             }
         });
-
 //———————————————————ПІПЕТКА
         JButton pipetteBtn = createToolButton("ПІПЕТКА", TEXT_COL, baseFont);
         pipetteBtn.setBackground(CANVAS_COL);
 
         pipetteBtn.addActionListener(e -> {
+            controller.setPipetteActive(true);
             canvasPanel.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
             pipetteBtn.setBackground(new Color(175, 230, 245));
 
@@ -87,6 +87,8 @@ public class ToolBar extends JPanel {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     } finally {
+                        controller.setPipetteActive(false);
+
                         canvasPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         pipetteBtn.setBackground(CANVAS_COL);
 
@@ -100,7 +102,6 @@ public class ToolBar extends JPanel {
         });
         add(pipetteBtn);
         add(Box.createRigidArea(new Dimension(0, 10)));
-
 //———————————————————ГУМКА
         JButton eraserBtn = createToolButton("ГУМКА", TEXT_COL, baseFont);
         eraserBtn.setBackground(CANVAS_COL);

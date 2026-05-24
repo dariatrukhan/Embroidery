@@ -13,6 +13,8 @@ public class DrawController {
 
     private boolean RepeatActive = false;
     private int repeatStep = 1;
+    private boolean isPipetteActive = false;
+    public void setPipetteActive(boolean active) { this.isPipetteActive = active; }
 
     private final Stack<int[][]> undoStack = new Stack<>();
     private final Stack<int[][]> redoStack = new Stack<>();
@@ -81,6 +83,9 @@ public class DrawController {
     }
 
     public void handleDraw(int mouseX, int mouseY, int offsetX, int offsetY, int fixedCanvasSize) {
+        if (isPipetteActive) {
+            return;
+        }
         int maxDimension = Math.max(rowsCount, colsCount);
         double exactCellSize = (double) fixedCanvasSize / maxDimension;
 
