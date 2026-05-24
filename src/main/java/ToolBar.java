@@ -124,7 +124,7 @@ public class ToolBar extends JPanel {
         clearBtn.setBackground(new Color(255, 210, 210));
         clearBtn.setForeground(TEXT_COL);
         clearBtn.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this, "Повністю очистити полотно?", "Очищення", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, "Повністю очистити полотно?", "Очистити", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 controller.clearGrid();
                 canvasPanel.repaint();
@@ -138,42 +138,11 @@ public class ToolBar extends JPanel {
         add(clearBtn);
         add(Box.createRigidArea(new Dimension(0, 15)));
 
-//———————————————————МАСШТАБ СІТКИ
-        JLabel sizeTitle = new JLabel("МАСШТАБ СІТКИ");
-        sizeTitle.setFont(baseFont.deriveFont(11f));
-        sizeTitle.setForeground(TEXT_COL);
-        sizeTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(sizeTitle);
+//———————————————————РОЗМІР ПОЛОТНА
+        JButton sizeBtn = createToolButton("РОЗМІР ПОЛОТНА", PALETTE_BORDER, baseFont);
+        sizeBtn.addActionListener(e -> showSizeChooser());
+        add(sizeBtn);
         add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JPanel sizeBtnPanel = new JPanel(new GridLayout(1, 3, -2, 0));
-        sizeBtnPanel.setOpaque(false);
-        sizeBtnPanel.setPreferredSize(new Dimension(140, 35));
-        sizeBtnPanel.setMaximumSize(new Dimension(140, 27));
-
-        JButton size17 = new JButton("17");
-        JButton size27 = new JButton("27");
-        JButton size37 = new JButton("37");
-
-        Font sizeFont = baseFont.deriveFont(12f);
-        for (JButton btn : new JButton[]{size17, size27, size37}) {
-            btn.setFont(sizeFont);
-            btn.setFocusPainted(false);
-            btn.setBackground(CANVAS_COL);
-            btn.setForeground(TEXT_COL);
-            btn.setBorder(new LineBorder(TEXT_COL, 2));
-            btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        }
-
-        size17.addActionListener(e -> changeGridSize(17));
-        size27.addActionListener(e -> changeGridSize(27));
-        size37.addActionListener(e -> changeGridSize(37));
-
-        sizeBtnPanel.add(size17);
-        sizeBtnPanel.add(size27);
-        sizeBtnPanel.add(size37);
-        add(sizeBtnPanel);
-        add(Box.createRigidArea(new Dimension(0, 15)));
 
 //———————————————————ЗБЕРЕГТИ
         JButton saveBtn = createToolButton("ЗБЕРЕГТИ", TEXT_COL, baseFont);
@@ -210,14 +179,95 @@ public class ToolBar extends JPanel {
         add(horizCheck);
         add(Box.createRigidArea(new Dimension(0, 5)));
         add(vertCheck);
-    }
 
-    private void changeGridSize(int newSize) {
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Зміна масштабу очистить поточне полотно. Продовжити?",
-                "Зміна масштабу", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            controller.changeGridSize(newSize);
+//———————————————————ДУБЛЮВАННЯ
+        add(Box.createRigidArea(new Dimension(0, 15)));
+        JLabel repeatTitle = new JLabel("ДУБЛЮВАННЯ");
+        repeatTitle.setFont(baseFont.deriveFont(11f));
+        repeatTitle.setForeground(TEXT_COL);
+        repeatTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(repeatTitle);
+        add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JPanel stepPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        stepPanel.setOpaque(false);
+
+        JCheckBox stepLabel = new JCheckBox("Крок:");
+        stepLabel.setFont(baseFont.deriveFont(11f));
+        stepLabel.setForeground(TEXT_COL);
+
+        SpinnerModel spinnerModel = new SpinnerNumberModel(controller.getRepeatStep(), 5, 15, 1);
+        JSpinner stepSpinner = new JSpinner(spinnerModel);
+        stepSpinner.setFont(baseFont.deriveFont(11f));
+        stepSpinner.setPreferredSize(new Dimension(50, 22));
+        stepSpinner.setEnabled(false);
+
+        stepLabel.addActionListener(e -> {
+            boolean active = stepLabel.isSelected();
+            controller.setRepeatActive(active);
+            stepSpinner.setEnabled(active);
+        });
+
+        stepSpinner.addChangeListener(e -> {
+            int newStep = (int) stepSpinner.getValue();
+            controller.setRepeatStep(newStep);
+        });
+
+        stepPanel.add(stepLabel);
+        stepPanel.add(stepSpinner);
+
+        add(stepLabel);
+        add(Box.createRigidArea(new Dimension(0, 5)));
+        add(stepPanel);
+
+//———————————————————КНОПКИ ДУБЛЮВАННЯ
+        JButton btnDupVert = createToolButton("вертикально", TEXT_COL, baseFont);
+        btnDupVert.addActionListener(e -> {
+            controller.duplicateVertically();
+            canvasPanel.repaint();
+        });
+
+        JButton btnDupHor = createToolButton("горизонтально", PALETTE_BORDER, baseFont);
+        btnDupHor.addActionListener(e -> {
+            controller.duplicateHorizontally();
+            canvasPanel.repaint();
+        });
+
+        add(Box.createRigidArea(new Dimension(0, 15)));
+        add(btnDupVert);
+        add(Box.createRigidArea(new Dimension(0, 8)));
+        add(btnDupHor);
+    }
+    private void showSizeChooser() {
+        SpinnerNumberModel widthModel = new SpinnerNumberModel(controller.getColsCount(), 17, 68, 1);
+
+        JSpinner widthSpinner = new JSpinner(widthModel);
+        JButton defaultButton = new JButton("17 x 17 за замовчуванням");
+
+        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 10));
+
+        defaultButton.addActionListener(e -> {
+            widthSpinner.setValue(17);
+        });
+
+        panel.add(new JLabel("Розмір (17-68):"));
+        panel.add(widthSpinner);
+        panel.add(widthSpinner);
+        panel.add(new JLabel(""));
+        panel.add(defaultButton);
+
+        int result = JOptionPane.showConfirmDialog(
+                SwingUtilities.getWindowAncestor(this),
+                panel,
+                "Оберіть кількість клітинок в полотні",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION) {
+            int width = (int) widthSpinner.getValue();
+
+            controller.changeGridSize(width, width);
             canvasPanel.repaint();
         }
     }

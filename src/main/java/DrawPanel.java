@@ -46,10 +46,19 @@ public class DrawPanel extends JPanel {
     }
 
     private void triggerDraw(int mouseX, int mouseY) {
-        int offsetX = 50;
-        int offsetY = (getHeight() - fixedCanvasSize) / 2;
+        int rows = controller.getRowsCount();
+        int cols = controller.getColsCount();
+        int maxDimension = Math.max(rows, cols);
+
+        double exactCellSize = (double) fixedCanvasSize / maxDimension;
+        int gridTotalWidth = (int) Math.round(cols * exactCellSize);
+        int gridTotalHeight = (int) Math.round(rows * exactCellSize);
+
+        int offsetX = (getWidth() - gridTotalWidth - 250) / 2;
+        int offsetY = (getHeight() - gridTotalHeight + 40) / 2;
+
         controller.handleDraw(mouseX, mouseY, offsetX, offsetY, fixedCanvasSize);
-        this.repaint(offsetX, offsetY, fixedCanvasSize, fixedCanvasSize);
+        repaint();
     }
 
     private JPanel getJPanel(JPanel mainContainer, CardLayout cardLayout, Font baseFont) {
@@ -69,50 +78,6 @@ public class DrawPanel extends JPanel {
         topPanel.add(backBtn);
         return topPanel;
     }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        int offsetX = 50;
-        int offsetY = (getHeight() - fixedCanvasSize) / 2;
-
-        g2.setColor(CANVAS_COLOR);
-        g2.fillRect(offsetX - 20, offsetY - 20, fixedCanvasSize + 40, fixedCanvasSize + 40);
-
-        int gridCount = controller.getGridCount();
-        int[][] grid = controller.getGrid();
-        double exactCellSize = (double) fixedCanvasSize / gridCount;
-
-        // сітка
-        for (int row = 0; row < gridCount; row++) {
-            for (int col = 0; col < gridCount; col++) {
-                int x = (int) Math.round(offsetX + col * exactCellSize);
-                int y = (int) Math.round(offsetY + row * exactCellSize);
-                int currentCellSize = (int) Math.round((col + 1) * exactCellSize) - (int) Math.round(col * exactCellSize);
-
-                g2.setColor(HOLE_COLOR);
-                g2.fillOval(x - 2, y - 2, 4, 4);
-
-                if (grid[row][col] != 0) {
-                    Color crossColor = new Color(grid[row][col]);
-                    drawAdaptiveCross(g2, x, y, currentCellSize, crossColor);
-                }
-            }
-        }
-
-        // точки
-        g2.setColor(HOLE_COLOR);
-        for (int i = 0; i <= gridCount; i++) {
-            int pos = (int) Math.round(i * exactCellSize);
-            g2.fillOval(offsetX + fixedCanvasSize - 2, offsetY + pos - 2, 4, 4);
-            g2.fillOval(offsetX + pos - 2, offsetY + fixedCanvasSize - 2, 4, 4);
-        }
-        g2.setStroke(new BasicStroke(2));
-    }
-
     public static void drawAdaptiveCross(Graphics2D g2, int x, int y, int size, Color crossColor) {
         Color shadowColor = new Color(crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), 80);
         g2.setColor(shadowColor);
@@ -126,8 +91,53 @@ public class DrawPanel extends JPanel {
         g2.drawLine(x + padding, y + padding, x + size - padding, y + size - padding);
         g2.drawLine(x + size - padding, y + padding, x + padding, y + size - padding);
     }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // завантаження файла
+        int rows = controller.getRowsCount();
+        int cols = controller.getColsCount();
+        int[][] grid = controller.getGrid();
+
+        int maxDimension = Math.max(rows, cols);
+        double exactCellSize = (double) fixedCanvasSize / maxDimension;
+
+        int gridTotalWidth = (int) Math.round(cols * exactCellSize);
+        int gridTotalHeight = (int) Math.round(rows * exactCellSize);
+
+        int offsetX = (getWidth() - gridTotalWidth - 250) / 2;
+        int offsetY = (getHeight() - gridTotalHeight + 40) / 2;
+
+        g2.setColor(CANVAS_COLOR);
+        g2.fillRect(offsetX - 20, offsetY - 20, gridTotalWidth + 40, gridTotalHeight + 40);
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (grid[row][col] != 0) {
+                    int x = (int) Math.round(offsetX + col * exactCellSize);
+                    int y = (int) Math.round(offsetY + row * exactCellSize);
+
+                    int currentCellSize = (int) Math.round((col + 1) * exactCellSize) - (int) Math.round(col * exactCellSize);
+
+                    Color crossColor = new Color(grid[row][col]);
+                    drawAdaptiveCross(g2, x, y, currentCellSize, crossColor);
+                }
+            }
+        }
+
+        g2.setColor(HOLE_COLOR);
+        for (int i = 0; i <= rows; i++) {
+            int yPos = (int) Math.round(offsetY + i * exactCellSize);
+            for (int j = 0; j <= cols; j++) {
+                int xPos = (int) Math.round(offsetX + j * exactCellSize);
+                g2.fillOval(xPos - 2, yPos - 2, 4, 4);
+            }
+        }
+
+        g2.setStroke(new BasicStroke(2));
+    }
     public void loadGridData(int[][] loadedData) {
         if (loadedData != null) {
             controller.setGrid(loadedData);

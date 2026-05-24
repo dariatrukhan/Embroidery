@@ -7,11 +7,14 @@ import java.io.*;
 public class ImageSaver {
 
     public static void savePanelAsPNG(Component panel, DrawController controller) {
-        int gridCount = controller.getGridCount();
-        int cellSize = (gridCount == 17) ? 30 : (gridCount == 27 ? 18 : 13);
-        int gridTotalSize = gridCount * cellSize;
-        int canvasWidth = gridTotalSize + 40;
-        int canvasHeight = gridTotalSize + 40;
+        int rows = controller.getRowsCount();
+        int cols = controller.getColsCount();
+
+        int maxDimension = Math.max(rows, cols);
+        int cellSize = (maxDimension <= 17) ? 30 : (maxDimension <= 27 ? 18 : 13);
+
+        int canvasWidth = cols * cellSize + 40;
+        int canvasHeight = rows * cellSize + 40;
 
         BufferedImage image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
@@ -24,8 +27,8 @@ public class ImageSaver {
         int[][] grid = controller.getGrid();
         int startOffset = 20;
 
-        for (int row = 0; row < gridCount; row++) {
-            for (int col = 0; col < gridCount; col++) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
                 if (grid[row][col] != 0) {
                     int x = startOffset + col * cellSize;
                     int y = startOffset + row * cellSize;
@@ -69,28 +72,35 @@ public class ImageSaver {
                     return null;
                 }
 
-                int width = image.getWidth();
-                int innerWidth = width - 40;
-                int detectedGridCount;
+                int innerWidth = image.getWidth() - 40;
+                int innerHeight = image.getHeight() - 40;
 
-                //  17:17 * 30 = 510, 27:27 * 18 = 486, 37:37 * 13 = 481
-                if (innerWidth >= 491 && innerWidth <= 510){
-                    detectedGridCount = 17;
-                }
-                else if (innerWidth >= 485 && innerWidth <= 490) {
-                    detectedGridCount = 27;
+//————————————————————————————————————ВИЗНАЧЕННЯ cellSize
+                int maxInner = Math.max(innerWidth, innerHeight);
+                int cellSize;
+
+                if (maxInner % 30 == 0 || (maxInner >= 510 && maxInner <= 540)) {
+                    cellSize = 30;
+                } else if (maxInner % 18 == 0 || (maxInner >= 486 && maxInner <= 500)) {
+                    cellSize = 18;
                 } else {
-                    detectedGridCount = 37;
+                    cellSize = 13;
                 }
-                double calculatedCellSize = (double) innerWidth / detectedGridCount;
-                int[][] loadedGrid = new int[detectedGridCount][detectedGridCount];
+
+                int detectedCols = (int) Math.round((double) innerWidth / cellSize);
+                int detectedRows = (int) Math.round((double) innerHeight / cellSize);
+
+                if (detectedCols <= 0) detectedCols = 1;
+                if (detectedRows <= 0) detectedRows = 1;
+
+                int[][] loadedGrid = new int[detectedRows][detectedCols];
                 int startOffset = 20;
 
-                for (int row = 0; row < detectedGridCount; row++) {
-                    for (int col = 0; col < detectedGridCount; col++) {
+                for (int row = 0; row < detectedRows; row++) {
+                    for (int col = 0; col < detectedCols; col++) {
 
-                        int centerX = (int) Math.round(startOffset + col * calculatedCellSize + (calculatedCellSize / 2.0));
-                        int centerY = (int) Math.round(startOffset + row * calculatedCellSize + (calculatedCellSize / 2.0));
+                        int centerX = (int) Math.round(startOffset + col * cellSize + (cellSize / 2.0));
+                        int centerY = (int) Math.round(startOffset + row * cellSize + (cellSize / 2.0));
 
                         if (centerX < image.getWidth() && centerY < image.getHeight()) {
                             int rgb = image.getRGB(centerX, centerY);
@@ -106,7 +116,10 @@ public class ImageSaver {
                     }
                 }
 
-                JOptionPane.showMessageDialog(parent, "Малюнок успішно завантажено!\nМасштаб: " + detectedGridCount + "x" + detectedGridCount, "Завантажено", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(parent,
+                        "Малюнок успішно завантажено!\nРозмір полотна: " + detectedCols + "x" + detectedRows,
+                        "Завантажено", JOptionPane.INFORMATION_MESSAGE);
+
                 return loadedGrid;
 
             } catch (IOException ex) {
