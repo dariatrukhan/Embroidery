@@ -345,11 +345,20 @@ public class ToolBar extends JPanel {
         );
 
         if (result == JOptionPane.OK_OPTION) {
-            int width = (int) widthSpinner.getValue();
-            int height = (int) heightSpinner.getValue();
-
-            controller.changeGridSize(height, width);
-            canvasPanel.repaint();
+            int result1 = JOptionPane.showConfirmDialog(
+                    SwingUtilities.getWindowAncestor(this),
+                    "Зміна масштабу очистить полотно. Продовжити? \n(попередній малюнок можна буде повернути через \"◀\")",
+                    "Підтвердити",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            if (result1 == JOptionPane.OK_OPTION) {
+                int width = (int) widthSpinner.getValue();
+                int height = (int) heightSpinner.getValue();
+                controller.changeGridSize(height, width);
+                if (canvasPanel instanceof DrawPanel) {
+                }
+                canvasPanel.repaint();
+            }
         }
     }
 
