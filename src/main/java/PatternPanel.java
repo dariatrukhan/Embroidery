@@ -10,6 +10,7 @@ public class PatternPanel extends JPanel {
 
     private int activeSector = -1;
 
+    private final int[][] pattern;
     private final Color CANVAS_COLOR = new Color(245, 235, 215);
     private static final Color HOLE_COLOR = new Color(180, 170, 150);
     private final Color RED = new Color(193, 91, 91);
@@ -17,7 +18,7 @@ public class PatternPanel extends JPanel {
     private final Color HIGHLIGHT_COLOR = new Color(60, 189, 209);
 
     public PatternPanel() {
-        int[][] pattern = {
+        pattern = new int[][]{
                 {0,0,0,0,0,3,3,0,0,0,3,3,0,0,0,0,0},
                 {0,1,0,1,0,3,0,3,1,3,0,3,0,1,0,1,0},
                 {0,0,1,1,0,0,3,1,1,1,3,0,0,1,1,0,0},
@@ -36,7 +37,11 @@ public class PatternPanel extends JPanel {
                 {0,1,0,1,0,3,0,3,1,3,0,3,0,1,0,1,0},
                 {0,0,0,0,0,3,3,0,0,0,3,3,0,0,0,0,0}
         };
-        for (int r = 0; r < GRID_COUNT; r++) System.arraycopy(pattern[r], 0, grid[r], 0, GRID_COUNT);
+        for (int r = 0; r < GRID_COUNT; r++) {
+            for (int c = 0; c < GRID_COUNT; c++) {
+                grid[r][c] = 0;
+            }
+        }
         initMasks();
     }
 
@@ -213,6 +218,59 @@ public class PatternPanel extends JPanel {
             g2.fillOval(offsetX + gridTotalSize - 2, offsetY + i * cellSize - 2, 4, 4);
             g2.fillOval(offsetX + i * cellSize - 2, offsetY + gridTotalSize - 2, 4, 4);
         }
+    }
+    public void startSequentialAnimation(JPanel topPanel) {
+        final int[] currentLetterIndex = {0};
+        final int[] currentRow = {0};
+        final int[] currentCol = {0};
+
+        if (topPanel.getComponentCount() > 0) {
+            topPanel.getComponent(0).setVisible(true);
+            topPanel.revalidate();
+            topPanel.repaint();
+        }
+
+        Timer animationTimer = new Timer(30, null);
+        animationTimer.addActionListener(e -> {
+            int letterIdx = currentLetterIndex[0];
+
+            if (letterIdx < highlightMasks.length) {
+
+                boolean cellFound = false;
+                while (currentRow[0] < GRID_COUNT && !cellFound) {
+                    int r = currentRow[0];
+                    int c = currentCol[0];
+
+                    if (highlightMasks[letterIdx][r][c] == 1) {
+                        grid[r][c] = pattern[r][c];
+                        repaint();
+                        cellFound = true;
+                    }
+
+                    currentCol[0]++;
+                    if (currentCol[0] >= GRID_COUNT) {
+                        currentCol[0] = 0;
+                        currentRow[0]++;
+                    }
+                }
+
+                if (currentRow[0] >= GRID_COUNT) {
+                    currentLetterIndex[0]++;
+                    currentRow[0] = 0;
+                    currentCol[0] = 0;
+
+                    if (currentLetterIndex[0] < topPanel.getComponentCount()) {
+                        topPanel.getComponent(currentLetterIndex[0]).setVisible(true);
+                        topPanel.revalidate();
+                        topPanel.repaint();
+                    }
+                }
+            } else {
+                animationTimer.stop();
+            }
+        });
+
+        animationTimer.start();
     }
 
     public int[][] getGrid() {

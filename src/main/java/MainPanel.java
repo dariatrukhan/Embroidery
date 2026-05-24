@@ -54,7 +54,7 @@ public class MainPanel extends JFrame {
         String name = "Дар'я";
         for (int i = 0; i < name.length(); i++) {
             JLabel letterLabel = getJLabel(name, i, patternPanel);
-
+            letterLabel.setVisible(false);
             topPanel.add(letterLabel);
         }
 
@@ -66,8 +66,8 @@ public class MainPanel extends JFrame {
         mainContainer.add(drawPanel, "DRAW");
 
         add(mainContainer, BorderLayout.CENTER);
-
         cardLayout.show(mainContainer, "MAIN");
+        patternPanel.startSequentialAnimation(topPanel);
     }
 
     private JLabel getJLabel(String name, int i, PatternPanel patternPanel) {
