@@ -62,11 +62,10 @@ public class DrawController {
         undoStack.clear();
         redoStack.clear();
     }
-
-    public void changeGridSize(int newSize, int width) {
+    public void changeGridSize(int newRows, int newCols) {
         clearHistory();
-        this.rowsCount = newSize;
-        this.colsCount = newSize;
+        this.rowsCount = newRows;
+        this.colsCount = newCols;
         this.grid = new int[rowsCount][colsCount];
         clearGrid();
     }
@@ -123,6 +122,7 @@ public class DrawController {
                     javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
+        saveStateToUndo();
 
         int[][] tempGrid = new int[rowsCount * 2][colsCount];
         for (int i = 0; i < rowsCount; i++) {
@@ -143,6 +143,7 @@ public class DrawController {
                     javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
+        saveStateToUndo();
 
         int[][] tempGrid = new int[rowsCount][colsCount * 2];
         for (int i = 0; i < rowsCount; i++) {

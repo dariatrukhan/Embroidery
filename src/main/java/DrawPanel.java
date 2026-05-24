@@ -34,8 +34,8 @@ public class DrawPanel extends JPanel {
         MouseAdapter mouseHandler = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                triggerDraw(e.getX(), e.getY());
                 controller.saveStateToUndo();
+                triggerDraw(e.getX(), e.getY());
             }
 
             @Override

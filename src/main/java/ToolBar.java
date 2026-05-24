@@ -160,7 +160,7 @@ public class ToolBar extends JPanel {
         JButton saveBtn = createToolButton("ЗБЕРЕГТИ", TEXT_COL, baseFont);
         saveBtn.setBackground(new Color(202, 238, 248));
         saveBtn.addActionListener(e -> {
-            ImageSaver.savePanelAsPNG(this, controller);
+            ImageSaver.savePanelAsPNG(canvasPanel, controller);
         });
         add(saveBtn);
         add(Box.createRigidArea(new Dimension(0, 15)));
@@ -246,11 +246,6 @@ public class ToolBar extends JPanel {
             stepSpinner.setEnabled(active);
         });
 
-        stepSpinner.addChangeListener(e -> {
-            int newStep = (int) stepSpinner.getValue();
-            controller.setRepeatStep(newStep);
-        });
-
         gbcStep.gridx = 0;
         gbcStep.weightx = 0.0;
         gbcStep.insets = new Insets(0, 0, 0, 0);
@@ -320,39 +315,44 @@ public class ToolBar extends JPanel {
     }
     private void showSizeChooser() {
         SpinnerNumberModel widthModel = new SpinnerNumberModel(controller.getColsCount(), 17, 68, 1);
+        SpinnerNumberModel heightModel = new SpinnerNumberModel(controller.getRowsCount(), 17, 68, 1);
 
         JSpinner widthSpinner = new JSpinner(widthModel);
+        JSpinner heightSpinner = new JSpinner(heightModel);
         JButton defaultButton = new JButton("17 x 17 за замовчуванням");
 
-        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 10));
+        JPanel panel = new JPanel(new GridLayout(4, 2, 5, 10));
 
         defaultButton.addActionListener(e -> {
             widthSpinner.setValue(17);
+            heightSpinner.setValue(17);
         });
 
-        panel.add(new JLabel("Розмір (17-68):"));
+        panel.add(new JLabel("Ширина (стовпці 17-68):"));
         panel.add(widthSpinner);
-        panel.add(widthSpinner);
+        panel.add(new JLabel("Висота (рядки 17-68):"));
+        panel.add(heightSpinner);
         panel.add(new JLabel(""));
         panel.add(defaultButton);
 
         int result = JOptionPane.showConfirmDialog(
                 SwingUtilities.getWindowAncestor(this),
                 panel,
-                "Оберіть кількість клітинок в полотні",
+                "Оберіть розміри полотна",
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE
         );
 
         if (result == JOptionPane.OK_OPTION) {
             int width = (int) widthSpinner.getValue();
+            int height = (int) heightSpinner.getValue();
 
-            controller.changeGridSize(width, width);
+            controller.changeGridSize(height, width);
             canvasPanel.repaint();
         }
     }
 
-//——————————————————————КНОПКИ ІНСТРУМЕНТІВ
+    //——————————————————————КНОПКИ ІНСТРУМЕНТІВ
     private JButton createToolButton(String text, Color borderCol, Font font) {
         JButton btn = new JButton(text);
         btn.setFont(font.deriveFont(10f));
