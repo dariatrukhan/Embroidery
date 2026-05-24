@@ -13,8 +13,8 @@ public class DrawController {
 
     private boolean RepeatActive = false;
     private int repeatStep = 1;
+    private double scaleFactor = 1.0;
     private boolean isPipetteActive = false;
-    public void setPipetteActive(boolean active) { this.isPipetteActive = active; }
 
     private final Stack<int[][]> undoStack = new Stack<>();
     private final Stack<int[][]> redoStack = new Stack<>();
@@ -64,11 +64,7 @@ public class DrawController {
         this.rowsCount = newRows;
         this.colsCount = newCols;
         this.grid = new int[rowsCount][colsCount];
-        for (int row = 0; row < rowsCount; row++) {
-            for (int col = 0; col < colsCount; col++) {
-                grid[row][col] = 0;
-            }
-        }
+        clearGrid();
     }
 
     public void clearGrid() {
@@ -82,18 +78,33 @@ public class DrawController {
         }
     }
 
+    public double getScaleFactor() { return scaleFactor; }
+
+    public void zoomIn() {
+        if (scaleFactor < 3.0) {
+            scaleFactor += 0.1;
+        }
+    }
+
+    public void zoomOut() {
+        if (scaleFactor > 0.5) {
+            scaleFactor -= 0.1;
+        }
+    }
+
     public void handleDraw(int mouseX, int mouseY, int offsetX, int offsetY, int fixedCanvasSize) {
         if (isPipetteActive) {
             return;
         }
+
         int maxDimension = Math.max(rowsCount, colsCount);
-        double exactCellSize = (double) fixedCanvasSize / maxDimension;
+
+        double exactCellSize = ((double) fixedCanvasSize / maxDimension) * scaleFactor;
 
         int col = (int) ((mouseX - offsetX) / exactCellSize);
         int row = (int) ((mouseY - offsetY) / exactCellSize);
 
         if (row >= 0 && row < rowsCount && col >= 0 && col < colsCount) {
-            //saveStateToUndo();
             int valueToSet = EraserActive ? 0 : selectedColor.getRGB();
 
             grid[row][col] = valueToSet;
@@ -185,4 +196,5 @@ public class DrawController {
     public void setRepeatActive(boolean active) { this.RepeatActive = active; }
     public void setRepeatStep(int step) { this.repeatStep = step; }
     public void setGridCount(int patternGridSize) { this.rowsCount = patternGridSize; this.colsCount = patternGridSize; }
+    public void setPipetteActive(boolean active) { this.isPipetteActive = active; }
 }

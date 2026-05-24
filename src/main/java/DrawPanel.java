@@ -1,8 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class DrawPanel extends JPanel {
     private final DrawController controller;
@@ -19,7 +18,6 @@ public class DrawPanel extends JPanel {
         JPanel topPanel = getJPanel(mainContainer, cardLayout, baseFont);
         add(topPanel, BorderLayout.NORTH);
 
-        // палітра інструментів
         ToolBar palettePanel = new ToolBar(controller, this, baseFont);
 
         JPanel paletteWrapper = new JPanel(new GridBagLayout());
@@ -30,7 +28,8 @@ public class DrawPanel extends JPanel {
 
         add(paletteWrapper, BorderLayout.EAST);
 
-        // рух мишки
+        setupKeyBindings();
+
         MouseAdapter mouseHandler = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -47,12 +46,44 @@ public class DrawPanel extends JPanel {
         addMouseMotionListener(mouseHandler);
     }
 
+    private void setupKeyBindings() {
+        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getActionMap();
+
+        // +
+        inputMap.put(KeyStroke.getKeyStroke('+'), "zoomIn");
+        inputMap.put(KeyStroke.getKeyStroke('='), "zoomIn");
+        inputMap.put(KeyStroke.getKeyStroke("EQUALS"), "zoomIn");
+        inputMap.put(KeyStroke.getKeyStroke("ADD"), "zoomIn");
+
+        // -
+        inputMap.put(KeyStroke.getKeyStroke('-'), "zoomOut");
+        inputMap.put(KeyStroke.getKeyStroke("MINUS"), "zoomOut");
+        inputMap.put(KeyStroke.getKeyStroke("SUBTRACT"), "zoomOut");
+
+        actionMap.put("zoomIn", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.zoomIn();
+                repaint();
+            }
+        });
+
+        actionMap.put("zoomOut", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.zoomOut();
+                repaint();
+            }
+        });
+    }
+
     private void triggerDraw(int mouseX, int mouseY) {
         int rows = controller.getRowsCount();
         int cols = controller.getColsCount();
         int maxDimension = Math.max(rows, cols);
 
-        double exactCellSize = (double) fixedCanvasSize / maxDimension;
+        double exactCellSize = ((double) fixedCanvasSize / maxDimension) * controller.getScaleFactor();
         int gridTotalWidth = (int) Math.round(cols * exactCellSize);
         int gridTotalHeight = (int) Math.round(rows * exactCellSize);
 
@@ -72,7 +103,6 @@ public class DrawPanel extends JPanel {
         label.setForeground(TEXT_COLOR);
         JButton backBtn = Capabilities.statButton("Назад", baseFont.deriveFont(13f));
         backBtn.setFocusPainted(true);
-
         backBtn.setOpaque(false);
         backBtn.setContentAreaFilled(false);
 
@@ -128,7 +158,7 @@ public class DrawPanel extends JPanel {
         int[][] grid = controller.getGrid();
 
         int maxDimension = Math.max(rows, cols);
-        double exactCellSize = (double) fixedCanvasSize / maxDimension;
+        double exactCellSize = ((double) fixedCanvasSize / maxDimension) * controller.getScaleFactor();
 
         int gridTotalWidth = (int) Math.round(cols * exactCellSize);
         int gridTotalHeight = (int) Math.round(rows * exactCellSize);
