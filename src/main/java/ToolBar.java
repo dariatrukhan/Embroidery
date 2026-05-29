@@ -183,24 +183,24 @@ public class ToolBar extends JPanel {
         add(symmetryTitle);
         add(Box.createRigidArea(new Dimension(0, 5)));
 
-        JCheckBox horizCheck = new JCheckBox("горизонтальна");
-        horizCheck.setFont(baseFont.deriveFont(12f));
-        horizCheck.setOpaque(false);
-        horizCheck.setForeground(TEXT_COL);
-        horizCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizCheck.addActionListener(e -> controller.setHorActive(horizCheck.isSelected()));
+        JCheckBox verttCheck = new JCheckBox("вертикальна");
+        verttCheck.setFont(baseFont.deriveFont(12f));
+        verttCheck.setOpaque(false);
+        verttCheck.setForeground(TEXT_COL);
+        verttCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
+        verttCheck.addActionListener(e -> controller.setHorActive(verttCheck.isSelected()));
 
-        JCheckBox vertCheck = new JCheckBox("вертикальна");
-        vertCheck.setFont(baseFont.deriveFont(12f));
-        vertCheck.setOpaque(false);
-        vertCheck.setForeground(TEXT_COL);
-        vertCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
-        vertCheck.setMargin(new Insets(0, 0, 0, 25));
-        vertCheck.addActionListener(e -> controller.setVerActive(vertCheck.isSelected()));
+        JCheckBox horCheck = new JCheckBox("горизонтальна");
+        horCheck.setFont(baseFont.deriveFont(12f));
+        horCheck.setOpaque(false);
+        horCheck.setForeground(TEXT_COL);
+        horCheck.setAlignmentX(Component.CENTER_ALIGNMENT);
+        horCheck.setMargin(new Insets(0, 10, 0, 0));
+        horCheck.addActionListener(e -> controller.setVerActive(horCheck.isSelected()));
 
-        add(horizCheck);
+        add(verttCheck);
         add(Box.createRigidArea(new Dimension(0, 5)));
-        add(vertCheck);
+        add(horCheck);
 //———————————————————ЛІНІЯ
         JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
         separator2.setMaximumSize(new Dimension(Short.MAX_VALUE, 10));
